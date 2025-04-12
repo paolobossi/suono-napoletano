@@ -85,7 +85,7 @@ export default {
             animationTimingFunction: "cubic-bezier(0.8, 0, 1, 1)" 
           },
           "50%": { 
-            transform: "translateY(-15px)",
+            transform: "translateY(-25px)",
             animationTimingFunction: "cubic-bezier(0, 0, 0.2, 1)"
           },
         }
@@ -93,7 +93,7 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "bounce-slow": "bounce-slow 2s infinite",
+        "bounce-slow": "bounce-slow 1s infinite",
       },
     },
   },
