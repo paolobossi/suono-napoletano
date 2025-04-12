@@ -181,7 +181,7 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
         className={`fixed w-full flex justify-center transition-all duration-500 ease-out pointer-events-none`}
         style={{ 
           zIndex: 10,
-          bottom: showFanImage ? '-110px' : '-100%',  // Position 110px lower from bottom
+          bottom: showFanImage ? '-60px' : '-100%',  // Position 60px lower from bottom (110px - 50px)
           opacity: 1,
           width: '100vw',
           left: '50%',
