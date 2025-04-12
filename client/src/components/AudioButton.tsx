@@ -189,16 +189,16 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
           transition: 'bottom 0.5s cubic-bezier(0.17, 0.84, 0.44, 1)'
         }}
       >
-        <div style={{ paddingBottom: "65px" }}> {/* Add padding to keep fan image lower */}
-          <img 
-            src="/assets/napoli-fan.png" 
-            alt="Napoli Fan"
-            className={`w-52 h-auto object-contain ${showFanImage ? 'animate-bounce-slow' : ''}`}
-            style={{
-              filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))',
-            }}
-          />
-        </div>
+        <img 
+          src="/assets/napoli-fan.png" 
+          alt="Napoli Fan"
+          className={`w-52 h-auto object-contain ${showFanImage ? 'animate-bounce-slow' : ''}`}
+          style={{
+            filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))',
+            position: 'relative',
+            top: '-20px', // Pull up the image slightly to ensure it's visible above bottom edge
+          }}
+        />
       </div>
 
       <Button
