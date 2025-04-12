@@ -181,7 +181,7 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
         className={`fixed w-full flex justify-center transition-all duration-500 ease-out pointer-events-none`}
         style={{ 
           zIndex: 10,
-          bottom: showFanImage ? 0 : '-100%',
+          bottom: showFanImage ? '-110px' : '-100%',  // Position 110px lower from bottom
           opacity: 1,
           width: '100vw',
           left: '50%',
@@ -195,8 +195,7 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
           className={`w-52 h-auto object-contain ${showFanImage ? 'animate-bounce-slow' : ''}`}
           style={{
             filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))',
-            position: 'relative',
-            top: '-20px', // Pull up the image slightly to ensure it's visible above bottom edge
+            display: 'block',
           }}
         />
       </div>
