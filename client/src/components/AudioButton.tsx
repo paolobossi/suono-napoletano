@@ -12,6 +12,7 @@ interface AudioButtonProps {
 export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isAudioReady, setIsAudioReady] = useState(false);
+  const [showFanImage, setShowFanImage] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
@@ -61,6 +62,9 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
       // Reset playback position
       audioRef.current.currentTime = 0;
       
+      // Show the fan image immediately when starting playback
+      setShowFanImage(true);
+      
       // Play with better error handling
       const playPromise = audioRef.current.play();
       
@@ -73,6 +77,9 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
           })
           .catch(err => {
             console.error("Failed to play audio:", err);
+            
+            // Hide fan image on error
+            setShowFanImage(false);
             
             // Handle autoplay policy errors specifically (common first-click issue)
             if (err.name === 'NotAllowedError') {
@@ -97,6 +104,7 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
     } catch (err) {
       console.error("Error playing audio:", err);
       setIsPlaying(false);
+      setShowFanImage(false);
     }
   };
 
@@ -106,6 +114,9 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
     try {
       audioRef.current.pause();
       setIsPlaying(false);
+      
+      // Hide the fan image when stopping the audio
+      setShowFanImage(false);
     } catch (err) {
       console.error("Error stopping audio:", err);
     }
@@ -164,26 +175,53 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
   };
 
   return (
-    <Button
-      variant="default"
-      className={`w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full shadow-xl transform transition-all duration-150 flex items-center justify-center cursor-pointer select-none ${
-        isPlaying ? "scale-95" : ""
-      } ${
-        error ? "bg-red-600 hover:bg-red-700" : "bg-[#04a0e0] hover:bg-[#038ecf]"
-      }`}
-      onMouseDown={startAudio}
-      onTouchStart={startAudio}
-      onMouseUp={stopAudio}
-      onMouseLeave={stopAudio}
-      onTouchEnd={stopAudio}
-      disabled={isLoading || !!error || !audioUrl}
-      aria-label="Press and hold to play audio"
-      style={{
-        boxShadow: isPlaying ? '0 0 20px rgba(4, 160, 224, 0.7)' : '0 0 15px rgba(4, 160, 224, 0.4)',
-        border: '3px solid rgba(255, 255, 255, 0.4)'
-      }}
-    >
-      {getButtonContent()}
-    </Button>
+    <div className="relative">
+      {/* Fan image that slides in from bottom when button is pressed */}
+      <div 
+        className={`absolute w-full flex justify-center transition-all duration-500 ease-out ${
+          showFanImage ? 'bottom-0 opacity-100' : '-bottom-full opacity-0'
+        }`}
+        style={{ 
+          zIndex: 10, 
+          transform: `translateY(${showFanImage ? '-20px' : '100%'})`,
+          width: '100vw',
+          left: '50%',
+          marginLeft: '-50vw',  // Center the element
+          transition: 'transform 0.8s cubic-bezier(0.17, 0.84, 0.44, 1), opacity 0.5s ease-in'
+        }}
+      >
+        <img 
+          src="/assets/images/napoli-fan.png" 
+          alt="Napoli Fan"
+          className={`w-64 h-auto object-contain ${showFanImage ? 'animate-bounce-slow' : ''}`}
+          style={{
+            filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))',
+          }}
+        />
+      </div>
+
+      <Button
+        variant="default"
+        className={`w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full shadow-xl transform transition-all duration-150 flex items-center justify-center cursor-pointer select-none ${
+          isPlaying ? "scale-95" : ""
+        } ${
+          error ? "bg-red-600 hover:bg-red-700" : "bg-[#04a0e0] hover:bg-[#038ecf]"
+        }`}
+        onMouseDown={startAudio}
+        onTouchStart={startAudio}
+        onMouseUp={stopAudio}
+        onMouseLeave={stopAudio}
+        onTouchEnd={stopAudio}
+        disabled={isLoading || !!error || !audioUrl}
+        aria-label="Press and hold to play audio"
+        style={{
+          boxShadow: isPlaying ? '0 0 20px rgba(4, 160, 224, 0.7)' : '0 0 15px rgba(4, 160, 224, 0.4)',
+          border: '3px solid rgba(255, 255, 255, 0.4)',
+          zIndex: 20 // Keep button above the fan image
+        }}
+      >
+        {getButtonContent()}
+      </Button>
+    </div>
   );
 }
