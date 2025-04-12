@@ -178,16 +178,16 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
     <div className="relative">
       {/* Fan image that slides in from bottom when button is pressed */}
       <div 
-        className={`absolute w-full flex justify-center transition-all duration-500 ease-out ${
-          showFanImage ? 'bottom-0 opacity-100' : '-bottom-full opacity-0'
-        }`}
+        className={`absolute w-full flex justify-center transition-all duration-500 ease-out`}
         style={{ 
-          zIndex: 10, 
-          transform: `translateY(${showFanImage ? '-20px' : '100%'})`,
+          zIndex: 10,
+          bottom: 0,
+          opacity: 1,
+          transform: `translateY(${showFanImage ? '0' : '100%'})`,
           width: '100vw',
           left: '50%',
           marginLeft: '-50vw',  // Center the element
-          transition: 'transform 0.8s cubic-bezier(0.17, 0.84, 0.44, 1), opacity 0.5s ease-in'
+          transition: 'transform 0.5s cubic-bezier(0.17, 0.84, 0.44, 1)'
         }}
       >
         <img 
