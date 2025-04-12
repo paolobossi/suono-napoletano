@@ -1,40 +1,23 @@
-import type { Express } from "express";
+import express, { type Express } from "express";
 import { createServer, type Server } from "http";
-import ytdl from "ytdl-core";
+import path from "path";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // YouTube audio extraction endpoint
-  app.get("/api/youtube/audio", async (req, res) => {
+  // Serve static files from the assets directory
+  app.use('/assets', express.static(path.join(process.cwd(), 'assets')));
+  
+  // Audio endpoint - now using local MP3 file
+  app.get("/api/audio", (req, res) => {
     try {
-      const videoUrl = "https://youtu.be/gtMxyavOm_Q";
-      
-      // Validate video URL
-      if (!ytdl.validateURL(videoUrl)) {
-        return res.status(400).json({ message: "Invalid YouTube URL" });
-      }
-      
-      // Get basic info to verify availability
-      const info = await ytdl.getInfo(videoUrl);
-      
-      // Get audio-only format with highest quality
-      const audioFormats = ytdl.filterFormats(info.formats, 'audioonly');
-      const highestQualityAudio = audioFormats.sort((a, b) => {
-        return parseInt(b.audioBitrate as string) - parseInt(a.audioBitrate as string);
-      })[0];
-      
-      if (!highestQualityAudio || !highestQualityAudio.url) {
-        return res.status(404).json({ message: "No audio stream found" });
-      }
-      
-      // Return the audio URL to the client
+      // Return the local audio file information
       return res.json({ 
-        url: highestQualityAudio.url,
-        title: info.videoDetails.title,
-        author: info.videoDetails.author.name
+        url: "/assets/TarantellaNapoletana.mp3",
+        title: "Tarantella Napoletana",
+        author: "Traditional"
       });
     } catch (error) {
-      console.error("Error fetching YouTube audio:", error);
-      return res.status(500).json({ message: "Failed to extract audio from YouTube" });
+      console.error("Error serving audio:", error);
+      return res.status(500).json({ message: "Failed to serve audio file" });
     }
   });
 
