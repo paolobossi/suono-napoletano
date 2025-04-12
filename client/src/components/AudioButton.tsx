@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Play, Volume2, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+// Global audio instance to help with reliable access across the component
+let globalAudioInstance: HTMLAudioElement | null = null;
+
 interface AudioButtonProps {
   audioUrl: string | null;
   isLoading: boolean;
@@ -40,23 +43,51 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         });
       });
       
+      // Add ended event to automatically reset UI state
+      audio.addEventListener("ended", () => {
+        setIsPlaying(false);
+        setShowFanImage(false);
+      });
+      
       // Start preloading
       audio.preload = "auto";
       audio.src = audioUrl;
       audio.load();
       
-      // Store reference
+      // Store reference in both local ref and global variable for reliable access
       audioRef.current = audio;
+      globalAudioInstance = audio;
     }
 
+    // Global document listener for touch end events
+    const handleDocumentTouchEnd = () => {
+      // Force stop audio and reset UI when any touch ends anywhere on the document
+      if (isPlaying) {
+        if (globalAudioInstance) {
+          globalAudioInstance.pause();
+        }
+        setIsPlaying(false);
+        setShowFanImage(false);
+      }
+    };
+
+    // Add document-level touch end listener for iOS devices
+    document.addEventListener('touchend', handleDocumentTouchEnd);
+
     return () => {
+      // Clean up all listeners and references
+      document.removeEventListener('touchend', handleDocumentTouchEnd);
+      
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.src = "";
         setIsAudioReady(false);
       }
+      
+      // Also clean up global reference
+      globalAudioInstance = null;
     };
-  }, [audioUrl, toast]);
+  }, [audioUrl, toast, isPlaying]);
 
   // Function to handle starting audio playback
   const startAudio = () => {
@@ -141,34 +172,61 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
   
   // Improved touch handling for mobile devices
   const handleTouchStart = (e: React.TouchEvent) => {
-    // Don't call preventDefault() as it can interfere with some mobile browsers
-    // Instead, use passive touch events for better performance
-    
     // Ensure any lingering touch events are cleared
     if (touchTimerRef.current !== null) {
       window.clearTimeout(touchTimerRef.current);
       touchTimerRef.current = null;
     }
     
-    startAudio();
+    // Force clean state before starting
+    if (globalAudioInstance) {
+      globalAudioInstance.pause();
+    }
+    
+    // Add a very brief delay to ensure UI is fully reset
+    setTimeout(() => {
+      setIsPlaying(false);
+      setShowFanImage(false);
+      
+      // Now start audio after reset
+      startAudio();
+    }, 0);
   };
   
   const handleTouchEnd = (e: React.TouchEvent) => {
-    // Use a small delay before stopping to ensure it's properly registered
-    // This helps overcome issues where touch events don't properly register release
+    // Immediate force state reset for better mobile response
+    if (globalAudioInstance) {
+      globalAudioInstance.pause();
+    }
+    
+    setIsPlaying(false);
+    setShowFanImage(false);
+    
+    // Use a timeout to ensure UI state is cleaned up
     touchTimerRef.current = window.setTimeout(() => {
       stopAudio();
       touchTimerRef.current = null;
-    }, 50); // Slightly longer delay to ensure it registers
+    }, 10);
   };
   
   // Handle touch cancel events (e.g., when notifications appear or scroll happens)
   const handleTouchCancel = (e: React.TouchEvent) => {
-    // Ensure audio stops if the touch interaction is interrupted
+    // Immediate force pause for touch cancel
+    if (globalAudioInstance) {
+      globalAudioInstance.pause();
+    }
+    
+    // Force UI reset
+    setIsPlaying(false);
+    setShowFanImage(false);
+    
+    // Clear any pending timers
     if (touchTimerRef.current !== null) {
       window.clearTimeout(touchTimerRef.current);
       touchTimerRef.current = null;
     }
+    
+    // Complete stop process
     stopAudio();
   };
   
