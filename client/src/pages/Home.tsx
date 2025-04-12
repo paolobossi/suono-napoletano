@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AudioButton } from "@/components/AudioButton";
+// iPhone SE styles will be imported dynamically when needed
 
 interface AudioData {
   url: string;
@@ -11,9 +12,12 @@ interface AudioData {
 export default function Home() {
   const [isIPhoneSE, setIsIPhoneSE] = useState(false);
   
-  // Detect iPhone SE specifically
-  useEffect(() => {
+  // Detect iPhone SE specifically - using useLayoutEffect for faster execution
+  useLayoutEffect(() => {
     const checkIfIPhoneSE = () => {
+      // TESTING ONLY: Uncomment to force iPhone SE mode on any device
+      // return setIsIPhoneSE(true);
+      
       // Check for iPhone in user agent
       const isIOS = /iPhone|iPod/.test(navigator.userAgent);
       
@@ -27,17 +31,19 @@ export default function Home() {
       // Alternative detection for iPhone SE size range
       const isSmallScreen = window.innerHeight < 700 && window.innerWidth < 400;
       
-      // Normal detection for iPhone SE (without test mode)
-      
-      // For testing on non-iPhone devices 
-      // Add ?iphonese=1 to URL to simulate iPhone SE
+      // Explicit test mode from URL parameter
       const isTestMode = new URLSearchParams(window.location.search).get('iphonese') === '1';
       
-      // Determine final result - either real device detection or test mode
-      const finalResult = isTestMode || (isIOS && (isSEDimensions || isSmallScreen));
+      // Always treat actual iPhone SE dimensions as iPhone SE, regardless of userAgent
+      const hasExactSEDimensions = 
+        (window.innerWidth === 320 && window.innerHeight === 568) || // 1st gen exact match
+        (window.innerWidth === 375 && window.innerHeight === 667);   // 2nd gen exact match
+        
+      // Determine final result - test mode, exact dimensions, or regular detection
+      const finalResult = isTestMode || hasExactSEDimensions || (isIOS && (isSEDimensions || isSmallScreen));
       
       if (isTestMode) {
-        console.log('iPhone SE test mode activated');
+        console.log('iPhone SE test mode activated via URL parameter');
       }
       
       // Log device detection information (helps with debugging)
@@ -47,10 +53,21 @@ export default function Home() {
         width: window.innerWidth,
         isIOS,
         isSEDimensions,
+        hasExactSEDimensions,
         isSmallScreen,
         isTestMode,
         isIPhoneSE: finalResult
       });
+      
+      // Add a visible indicator in the console when iPhone SE mode is active
+      if (finalResult) {
+        console.log('%c 📱 iPhone SE mode active - button positioned higher', 'background: #04a0e0; color: white; padding: 4px; border-radius: 4px;');
+        
+        // Dynamically import iPhone SE specific CSS
+        import('@/iphoneSE.css').catch(err => {
+          console.error('Failed to load iPhone SE styles:', err);
+        });
+      }
       
       setIsIPhoneSE(finalResult);
     };
@@ -74,8 +91,24 @@ export default function Home() {
     queryKey: ["/api/audio"],
   });
 
+  // Create dynamic classes based on device detection
+  const buttonContainerClasses = `
+    absolute inset-0 flex items-center justify-center
+    ${isIPhoneSE ? 'iphone-se-position' : ''}
+  `;
+
   return (
     <div className="min-h-screen w-full overflow-hidden relative">
+      {/* iPhone SE specific CSS */}
+      {isIPhoneSE && (
+        <style>{`
+          .iphone-se-position {
+            margin-top: 20% !important;
+            transform: translateY(-70px) !important;
+          }
+        `}</style>
+      )}
+      
       {/* Background Image */}
       <div 
         className="absolute inset-0 w-full h-full"
@@ -89,15 +122,10 @@ export default function Home() {
       
       {/* Button Container - positioned to align with the grey area */}
       <div 
-        className="absolute inset-0 flex items-center justify-center"
+        className={buttonContainerClasses}
         style={{ 
-          marginTop: '45%', // Default positioning
-          // iPhone SE specific adjustment (move button 25px higher)
-          ...(isIPhoneSE ? { 
-            transform: 'translateY(-25px)',
-            marginTop: '40%' // Additional adjustment for iPhone SE
-          } : {})
-        }} // Adjust this value to center in the grey area
+          marginTop: '45%' // Default positioning for non-iPhone SE
+        }}
       >
         <AudioButton 
           audioUrl={audioData?.url || null} 
