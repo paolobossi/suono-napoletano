@@ -1,16 +1,14 @@
-import { useState, useEffect, useLayoutEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { AudioButton } from "@/components/AudioButton";
 // iPhone SE styles will be imported dynamically when needed
 
-interface AudioData {
-  url: string;
-  title: string;
-  author: string;
-}
-
 export default function Home() {
   const [isIPhoneSE, setIsIPhoneSE] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Direct audio file URL - no API dependency
+  const audioUrl = "/assets/TarantellaNapoletana.mp3";
   
   // Detect iPhone SE specifically - using useLayoutEffect for faster execution
   useLayoutEffect(() => {
@@ -83,13 +81,31 @@ export default function Home() {
     };
   }, []);
   
-  const {
-    data: audioData,
-    isLoading,
-    error,
-  } = useQuery<AudioData>({
-    queryKey: ["/api/audio"],
-  });
+  // Preload audio file to verify it exists
+  useEffect(() => {
+    const testAudio = new Audio(audioUrl);
+    
+    // Listen for the audio to be loaded
+    testAudio.addEventListener('canplaythrough', () => {
+      setIsLoading(false);
+      console.log('Audio file is valid and ready to play');
+    });
+    
+    // Handle errors loading the audio
+    testAudio.addEventListener('error', (e) => {
+      console.error('Error checking audio file:', e);
+      setError('Could not load audio file');
+      setIsLoading(false);
+    });
+    
+    // Start loading
+    testAudio.load();
+    
+    // Clean up
+    return () => {
+      testAudio.src = '';
+    };
+  }, [audioUrl]);
 
   // Create dynamic classes based on device detection
   const buttonContainerClasses = `
@@ -125,9 +141,9 @@ export default function Home() {
         }}
       >
         <AudioButton 
-          audioUrl={audioData?.url || null} 
+          audioUrl={error ? null : audioUrl} 
           isLoading={isLoading} 
-          error={error ? (error as Error).message : null}
+          error={error}
           isIPhoneSE={isIPhoneSE}
         />
       </div>

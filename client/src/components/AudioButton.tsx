@@ -58,8 +58,28 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       
       // Start preloading
       audio.preload = "auto";
-      audio.src = audioUrl;
-      audio.load();
+      
+      // Ensure we're setting a valid URL with full path (not empty or undefined)
+      // Convert relative URLs to absolute URLs if needed
+      let fullAudioUrl = audioUrl;
+      if (audioUrl && !audioUrl.startsWith('http') && !audioUrl.startsWith('blob:')) {
+        // Handle relative URLs by constructing absolute URL
+        const baseUrl = window.location.origin;
+        fullAudioUrl = `${baseUrl}${audioUrl.startsWith('/') ? '' : '/'}${audioUrl}`;
+      }
+      
+      console.log("Setting audio source:", audioUrl);
+      console.log("Full audio URL:", fullAudioUrl);
+      
+      // Set the source with the full URL
+      audio.src = fullAudioUrl || '';
+      
+      // Only load if we have a valid source
+      if (fullAudioUrl && fullAudioUrl.trim() !== '') {
+        audio.load();
+      } else {
+        console.error("Invalid audio URL provided:", audioUrl);
+      }
       
       // Store reference in both local ref and global variable for reliable access
       audioRef.current = audio;
