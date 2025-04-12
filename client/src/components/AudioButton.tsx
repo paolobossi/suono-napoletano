@@ -36,10 +36,17 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       
       audio.addEventListener("error", (e) => {
         console.error("Audio loading error:", e);
+        // Log more specific details about the error
+        if (audio.error) {
+          console.error("Audio error code:", audio.error.code);
+          console.error("Audio error message:", audio.error.message);
+        }
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "There was a problem loading the audio.",
+          title: "Audio Error",
+          description: audio.error ? 
+            `Error loading audio: ${audio.error.message}` : 
+            "There was a problem loading the audio file.",
         });
       });
       
