@@ -17,15 +17,23 @@ export default function Home() {
   });
 
   return (
-    <div 
-      className="min-h-screen w-full bg-cover bg-center flex items-center justify-center" 
-      style={{ 
-        backgroundImage: 'url(/assets/images/naples-background.png)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      }}
-    >
-      <div className="flex items-center justify-center">
+    <div className="min-h-screen w-full overflow-hidden relative">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 w-full h-full"
+        style={{ 
+          backgroundImage: 'url(/assets/images/naples-background.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      ></div>
+      
+      {/* Button Container - positioned to align with the grey area */}
+      <div 
+        className="absolute inset-0 flex items-center justify-center"
+        style={{ marginTop: '45%' }} // Adjust this value to center in the grey area
+      >
         <AudioButton 
           audioUrl={audioData?.url || null} 
           isLoading={isLoading} 

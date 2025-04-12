@@ -105,10 +105,10 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
   return (
     <Button
       variant="default"
-      className={`w-52 h-52 md:w-60 md:h-60 rounded-full shadow-lg transform transition-all duration-150 flex items-center justify-center cursor-pointer select-none ${
+      className={`w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full shadow-xl transform transition-all duration-150 flex items-center justify-center cursor-pointer select-none ${
         isPlaying ? "scale-95" : ""
       } ${
-        error ? "bg-red-600 hover:bg-red-700" : "bg-[#1E88E5] hover:bg-[#1976D2]"
+        error ? "bg-red-600 hover:bg-red-700" : "bg-[#4c4c4c] hover:bg-[#3a3a3a]"
       }`}
       onMouseDown={startAudio}
       onTouchStart={startAudio}
@@ -117,6 +117,10 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
       onTouchEnd={stopAudio}
       disabled={isLoading || !!error || !audioUrl}
       aria-label="Press and hold to play audio"
+      style={{
+        boxShadow: isPlaying ? '0 0 20px rgba(255, 255, 255, 0.5)' : '0 0 15px rgba(0, 0, 0, 0.3)',
+        border: '3px solid rgba(255, 255, 255, 0.2)'
+      }}
     >
       {getButtonContent()}
     </Button>
