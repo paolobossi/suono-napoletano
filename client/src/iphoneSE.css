@@ -1,5 +1,5 @@
 /* iPhone SE specific styles */
 .iphone-se-position {
-  /* Now moved 20px higher (25px up, then 5px down) - exactly as requested */
-  transform: translateY(-20px) !important;
+  /* Now moved 15px higher (25px up, then 10px down) - exactly as requested */
+  transform: translateY(-15px) !important;
 }
