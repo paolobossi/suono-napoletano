@@ -157,7 +157,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
     if (isPlaying) {
       return (
         <div className="flex items-center justify-center">
-          <div className="flex space-x-1">
+          <div className="flex space-x-1 transform scale-80"> {/* Reduced by 20% */}
             <div className="w-3 h-12 bg-white animate-pulse rounded-full"></div>
             <div className="w-3 h-16 bg-white animate-pulse rounded-full" style={{ animationDelay: "0.2s" }}></div>
             <div className="w-3 h-10 bg-white animate-pulse rounded-full" style={{ animationDelay: "0.4s" }}></div>
@@ -170,7 +170,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
 
     return (
       <div className="flex items-center justify-center">
-        <Volume2 className="h-18 w-18 text-white drop-shadow-md" />
+        <Volume2 className="h-18 w-18 text-white drop-shadow-md transform transition-transform" />
       </div>
     );
   };
