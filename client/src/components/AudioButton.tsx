@@ -7,9 +7,10 @@ interface AudioButtonProps {
   audioUrl: string | null;
   isLoading: boolean;
   error: string | null;
+  isIPhoneSE?: boolean;
 }
 
-export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
+export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: AudioButtonProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isAudioReady, setIsAudioReady] = useState(false);
   const [showFanImage, setShowFanImage] = useState(false);
@@ -192,10 +193,12 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
         <img 
           src="/assets/napoli-fan.png" 
           alt="Napoli Fan"
-          className={`w-52 h-auto object-contain ${showFanImage ? 'animate-bounce-slow' : ''}`}
+          className={`${isIPhoneSE ? 'w-52' : 'w-64'} h-auto object-contain ${showFanImage ? 'animate-bounce-slow' : ''}`}
           style={{
             filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))',
             display: 'block',
+            // 20% larger on non-iPhone SE devices
+            transform: isIPhoneSE ? 'none' : 'scale(1.2)',
           }}
         />
       </div>

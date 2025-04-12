@@ -127,7 +127,8 @@ export default function Home() {
         <AudioButton 
           audioUrl={audioData?.url || null} 
           isLoading={isLoading} 
-          error={error ? (error as Error).message : null} 
+          error={error ? (error as Error).message : null}
+          isIPhoneSE={isIPhoneSE}
         />
       </div>
     </div>
