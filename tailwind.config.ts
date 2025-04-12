@@ -3,6 +3,7 @@ import type { Config } from "tailwindcss";
 export default {
   darkMode: ["class"],
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
+  safelist: ['scale-80', 'scale-120'],
   theme: {
     extend: {
       borderRadius: {
@@ -94,6 +95,10 @@ export default {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "bounce-slow": "bounce-slow 1s infinite",
+      },
+      scale: {
+        '80': '0.8',
+        '120': '1.2',
       },
     },
   },

@@ -170,7 +170,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
 
     return (
       <div className="flex items-center justify-center">
-        <Volume2 className="h-18 w-18 text-white drop-shadow-md transform transition-transform" />
+        <Volume2 className="h-18 w-18 text-white drop-shadow-md transform scale-120 transition-transform" />
       </div>
     );
   };
