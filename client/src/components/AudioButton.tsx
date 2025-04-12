@@ -97,7 +97,7 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
 
     return (
       <div className="flex items-center justify-center">
-        <Volume2 className="h-16 w-16 text-white" />
+        <Volume2 className="h-18 w-18 text-white drop-shadow-md" />
       </div>
     );
   };
@@ -108,7 +108,7 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
       className={`w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full shadow-xl transform transition-all duration-150 flex items-center justify-center cursor-pointer select-none ${
         isPlaying ? "scale-95" : ""
       } ${
-        error ? "bg-red-600 hover:bg-red-700" : "bg-[#4c4c4c] hover:bg-[#3a3a3a]"
+        error ? "bg-red-600 hover:bg-red-700" : "bg-[#04a0e0] hover:bg-[#038ecf]"
       }`}
       onMouseDown={startAudio}
       onTouchStart={startAudio}
@@ -118,8 +118,8 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
       disabled={isLoading || !!error || !audioUrl}
       aria-label="Press and hold to play audio"
       style={{
-        boxShadow: isPlaying ? '0 0 20px rgba(255, 255, 255, 0.5)' : '0 0 15px rgba(0, 0, 0, 0.3)',
-        border: '3px solid rgba(255, 255, 255, 0.2)'
+        boxShadow: isPlaying ? '0 0 20px rgba(4, 160, 224, 0.7)' : '0 0 15px rgba(4, 160, 224, 0.4)',
+        border: '3px solid rgba(255, 255, 255, 0.4)'
       }}
     >
       {getButtonContent()}
