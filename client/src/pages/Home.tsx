@@ -13,7 +13,7 @@ export default function Home() {
     data: audioData,
     isLoading,
     error,
-  } = useQuery<YoutubeAudio>({
+  } = useQuery<AudioData>({
     queryKey: ["/api/audio"],
   });
 
@@ -23,7 +23,7 @@ export default function Home() {
         <h1 className="text-2xl font-medium mb-2">Audio Player</h1>
 
         <AudioButton 
-          audioUrl={audioData?.url} 
+          audioUrl={audioData?.url || null} 
           isLoading={isLoading} 
           error={error ? (error as Error).message : null} 
         />
