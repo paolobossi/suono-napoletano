@@ -3,9 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Play, Volume2, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-// Global audio instance to help with reliable access across the component
-let globalAudioInstance: HTMLAudioElement | null = null;
-
 interface AudioButtonProps {
   audioUrl: string | null;
   isLoading: boolean;
@@ -36,85 +33,30 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       
       audio.addEventListener("error", (e) => {
         console.error("Audio loading error:", e);
-        // Log more specific details about the error
-        if (audio.error) {
-          console.error("Audio error code:", audio.error.code);
-          console.error("Audio error message:", audio.error.message);
-        }
         toast({
           variant: "destructive",
-          title: "Audio Error",
-          description: audio.error ? 
-            `Error loading audio: ${audio.error.message}` : 
-            "There was a problem loading the audio file.",
+          title: "Error",
+          description: "There was a problem loading the audio.",
         });
-      });
-      
-      // Add ended event to automatically reset UI state
-      audio.addEventListener("ended", () => {
-        setIsPlaying(false);
-        setShowFanImage(false);
       });
       
       // Start preloading
       audio.preload = "auto";
+      audio.src = audioUrl;
+      audio.load();
       
-      // Ensure we're setting a valid URL with full path (not empty or undefined)
-      // Convert relative URLs to absolute URLs if needed
-      let fullAudioUrl = audioUrl;
-      if (audioUrl && !audioUrl.startsWith('http') && !audioUrl.startsWith('blob:')) {
-        // Handle relative URLs by constructing absolute URL
-        const baseUrl = window.location.origin;
-        fullAudioUrl = `${baseUrl}${audioUrl.startsWith('/') ? '' : '/'}${audioUrl}`;
-      }
-      
-      console.log("Setting audio source:", audioUrl);
-      console.log("Full audio URL:", fullAudioUrl);
-      
-      // Set the source with the full URL
-      audio.src = fullAudioUrl || '';
-      
-      // Only load if we have a valid source
-      if (fullAudioUrl && fullAudioUrl.trim() !== '') {
-        audio.load();
-      } else {
-        console.error("Invalid audio URL provided:", audioUrl);
-      }
-      
-      // Store reference in both local ref and global variable for reliable access
+      // Store reference
       audioRef.current = audio;
-      globalAudioInstance = audio;
     }
 
-    // Global document listener for touch end events
-    const handleDocumentTouchEnd = () => {
-      // Force stop audio and reset UI when any touch ends anywhere on the document
-      if (isPlaying) {
-        if (globalAudioInstance) {
-          globalAudioInstance.pause();
-        }
-        setIsPlaying(false);
-        setShowFanImage(false);
-      }
-    };
-
-    // Add document-level touch end listener for iOS devices
-    document.addEventListener('touchend', handleDocumentTouchEnd);
-
     return () => {
-      // Clean up all listeners and references
-      document.removeEventListener('touchend', handleDocumentTouchEnd);
-      
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.src = "";
         setIsAudioReady(false);
       }
-      
-      // Also clean up global reference
-      globalAudioInstance = null;
     };
-  }, [audioUrl, toast, isPlaying]);
+  }, [audioUrl, toast]);
 
   // Function to handle starting audio playback
   const startAudio = () => {
@@ -199,61 +141,34 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
   
   // Improved touch handling for mobile devices
   const handleTouchStart = (e: React.TouchEvent) => {
+    // Don't call preventDefault() as it can interfere with some mobile browsers
+    // Instead, use passive touch events for better performance
+    
     // Ensure any lingering touch events are cleared
     if (touchTimerRef.current !== null) {
       window.clearTimeout(touchTimerRef.current);
       touchTimerRef.current = null;
     }
     
-    // Force clean state before starting
-    if (globalAudioInstance) {
-      globalAudioInstance.pause();
-    }
-    
-    // Add a very brief delay to ensure UI is fully reset
-    setTimeout(() => {
-      setIsPlaying(false);
-      setShowFanImage(false);
-      
-      // Now start audio after reset
-      startAudio();
-    }, 0);
+    startAudio();
   };
   
   const handleTouchEnd = (e: React.TouchEvent) => {
-    // Immediate force state reset for better mobile response
-    if (globalAudioInstance) {
-      globalAudioInstance.pause();
-    }
-    
-    setIsPlaying(false);
-    setShowFanImage(false);
-    
-    // Use a timeout to ensure UI state is cleaned up
+    // Use a small delay before stopping to ensure it's properly registered
+    // This helps overcome issues where touch events don't properly register release
     touchTimerRef.current = window.setTimeout(() => {
       stopAudio();
       touchTimerRef.current = null;
-    }, 10);
+    }, 50); // Slightly longer delay to ensure it registers
   };
   
   // Handle touch cancel events (e.g., when notifications appear or scroll happens)
   const handleTouchCancel = (e: React.TouchEvent) => {
-    // Immediate force pause for touch cancel
-    if (globalAudioInstance) {
-      globalAudioInstance.pause();
-    }
-    
-    // Force UI reset
-    setIsPlaying(false);
-    setShowFanImage(false);
-    
-    // Clear any pending timers
+    // Ensure audio stops if the touch interaction is interrupted
     if (touchTimerRef.current !== null) {
       window.clearTimeout(touchTimerRef.current);
       touchTimerRef.current = null;
     }
-    
-    // Complete stop process
     stopAudio();
   };
   
