@@ -11,25 +11,45 @@ interface AudioButtonProps {
 
 export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isAudioReady, setIsAudioReady] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
+  // Initialize and preload audio
   useEffect(() => {
     if (audioUrl) {
-      audioRef.current = new Audio(audioUrl);
-      audioRef.current.addEventListener("error", () => {
+      // Create new audio element
+      const audio = new Audio();
+      
+      // Set up event listeners for preloading
+      audio.addEventListener("canplaythrough", () => {
+        setIsAudioReady(true);
+        console.log("Audio is ready to play");
+      });
+      
+      audio.addEventListener("error", (e) => {
+        console.error("Audio loading error:", e);
         toast({
           variant: "destructive",
           title: "Error",
-          description: "There was a problem playing the audio.",
+          description: "There was a problem loading the audio.",
         });
       });
+      
+      // Start preloading
+      audio.preload = "auto";
+      audio.src = audioUrl;
+      audio.load();
+      
+      // Store reference
+      audioRef.current = audio;
     }
 
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.src = "";
+        setIsAudioReady(false);
       }
     };
   }, [audioUrl, toast]);
@@ -38,18 +58,45 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
     if (!audioRef.current || !audioUrl) return;
     
     try {
+      // Reset playback position
       audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(err => {
-        console.error("Failed to play audio:", err);
-        toast({
-          variant: "destructive",
-          title: "Playback Error",
-          description: "Could not play the audio. Please try again.",
-        });
-      });
-      setIsPlaying(true);
+      
+      // Play with better error handling
+      const playPromise = audioRef.current.play();
+      
+      // Modern browsers return a promise from the play() method
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            // Playback started successfully
+            setIsPlaying(true);
+          })
+          .catch(err => {
+            console.error("Failed to play audio:", err);
+            
+            // Handle autoplay policy errors specifically (common first-click issue)
+            if (err.name === 'NotAllowedError') {
+              toast({
+                title: "Autoplay blocked",
+                description: "Please try clicking again to play the audio.",
+                duration: 3000,
+              });
+            } else {
+              toast({
+                variant: "destructive",
+                title: "Playback Error",
+                description: "Could not play the audio. Please try again.",
+                duration: 3000,
+              });
+            }
+          });
+      } else {
+        // Older browsers or successful play with no promise
+        setIsPlaying(true);
+      }
     } catch (err) {
       console.error("Error playing audio:", err);
+      setIsPlaying(false);
     }
   };
 
@@ -77,6 +124,20 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
       return (
         <div className="flex items-center justify-center">
           <AlertCircle className="h-12 w-12 text-white" />
+        </div>
+      );
+    }
+    
+    // Show different loading state when audio is not yet ready
+    if (!isAudioReady && audioUrl) {
+      return (
+        <div className="flex items-center justify-center">
+          <div className="relative">
+            <Volume2 className="h-16 w-16 text-white opacity-50" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-4 h-4 rounded-full border-2 border-transparent border-t-white animate-spin"></div>
+            </div>
+          </div>
         </div>
       );
     }
