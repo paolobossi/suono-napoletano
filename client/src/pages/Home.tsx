@@ -99,14 +99,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen w-full overflow-hidden relative">
-      {/* iPhone SE specific CSS */}
-      {isIPhoneSE && (
-        <style>{`
-          .iphone-se-position {
-            margin-top: 20% !important;
-            transform: translateY(-70px) !important;
-          }
-        `}</style>
+      {/* iPhone SE detection status indicator (for debugging) */}
+      {process.env.NODE_ENV === 'development' && isIPhoneSE && (
+        <div className="fixed top-0 left-0 bg-blue-500 text-white text-xs p-1 z-50">
+          iPhone SE mode active
+        </div>
       )}
       
       {/* Background Image */}

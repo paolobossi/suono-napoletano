@@ -1,5 +1,5 @@
 /* iPhone SE specific styles */
 .iphone-se-position {
-  margin-top: 20% !important; 
-  transform: translateY(-70px) !important;
+  /* Simple transform to move button 25px higher - exactly as requested */
+  transform: translateY(-25px) !important;
 }
