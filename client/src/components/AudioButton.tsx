@@ -178,7 +178,7 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
     <div className="relative">
       {/* Fan image that slides in from bottom when button is pressed */}
       <div 
-        className={`fixed w-full flex justify-center transition-all duration-500 ease-out`}
+        className={`fixed w-full flex justify-center transition-all duration-500 ease-out pointer-events-none`}
         style={{ 
           zIndex: 10,
           bottom: showFanImage ? 0 : '-100%',
@@ -189,14 +189,16 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
           transition: 'bottom 0.5s cubic-bezier(0.17, 0.84, 0.44, 1)'
         }}
       >
-        <img 
-          src="/assets/napoli-fan.png" 
-          alt="Napoli Fan"
-          className={`w-64 h-auto object-contain ${showFanImage ? 'animate-bounce-slow' : ''}`}
-          style={{
-            filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))',
-          }}
-        />
+        <div style={{ paddingBottom: "65px" }}> {/* Add padding to keep fan image lower */}
+          <img 
+            src="/assets/napoli-fan.png" 
+            alt="Napoli Fan"
+            className={`w-52 h-auto object-contain ${showFanImage ? 'animate-bounce-slow' : ''}`}
+            style={{
+              filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))',
+            }}
+          />
+        </div>
       </div>
 
       <Button
