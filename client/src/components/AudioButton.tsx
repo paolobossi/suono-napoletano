@@ -191,7 +191,7 @@ export function AudioButton({ audioUrl, isLoading, error }: AudioButtonProps) {
         }}
       >
         <img 
-          src="/assets/images/napoli-fan.png" 
+          src="/assets/napoli-fan.png" 
           alt="Napoli Fan"
           className={`w-64 h-auto object-contain ${showFanImage ? 'animate-bounce-slow' : ''}`}
           style={{
