@@ -15,6 +15,8 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
   const [isAudioReady, setIsAudioReady] = useState(false);
   const [showFanImage, setShowFanImage] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const touchTimerRef = useRef<number | null>(null);
   const { toast } = useToast();
 
   // Initialize and preload audio
@@ -56,10 +58,17 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
     };
   }, [audioUrl, toast]);
 
+  // Function to handle starting audio playback
   const startAudio = () => {
     if (!audioRef.current || !audioUrl) return;
     
     try {
+      // Clear any existing touch timer
+      if (touchTimerRef.current !== null) {
+        window.clearTimeout(touchTimerRef.current);
+        touchTimerRef.current = null;
+      }
+      
       // Reset playback position
       audioRef.current.currentTime = 0;
       
@@ -109,10 +118,17 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
     }
   };
 
+  // Function to handle stopping audio playback
   const stopAudio = () => {
     if (!audioRef.current) return;
     
     try {
+      // Ensure any touch timer is cleared
+      if (touchTimerRef.current !== null) {
+        window.clearTimeout(touchTimerRef.current);
+        touchTimerRef.current = null;
+      }
+      
       audioRef.current.pause();
       setIsPlaying(false);
       
@@ -122,6 +138,48 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       console.error("Error stopping audio:", err);
     }
   };
+  
+  // Improved touch handling for mobile devices
+  const handleTouchStart = (e: React.TouchEvent) => {
+    // Don't call preventDefault() as it can interfere with some mobile browsers
+    // Instead, use passive touch events for better performance
+    
+    // Ensure any lingering touch events are cleared
+    if (touchTimerRef.current !== null) {
+      window.clearTimeout(touchTimerRef.current);
+      touchTimerRef.current = null;
+    }
+    
+    startAudio();
+  };
+  
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    // Use a small delay before stopping to ensure it's properly registered
+    // This helps overcome issues where touch events don't properly register release
+    touchTimerRef.current = window.setTimeout(() => {
+      stopAudio();
+      touchTimerRef.current = null;
+    }, 50); // Slightly longer delay to ensure it registers
+  };
+  
+  // Handle touch cancel events (e.g., when notifications appear or scroll happens)
+  const handleTouchCancel = (e: React.TouchEvent) => {
+    // Ensure audio stops if the touch interaction is interrupted
+    if (touchTimerRef.current !== null) {
+      window.clearTimeout(touchTimerRef.current);
+      touchTimerRef.current = null;
+    }
+    stopAudio();
+  };
+  
+  // Clean up any timers when component unmounts
+  useEffect(() => {
+    return () => {
+      if (touchTimerRef.current !== null) {
+        window.clearTimeout(touchTimerRef.current);
+      }
+    };
+  }, []);
 
   const getButtonContent = () => {
     if (isLoading) {
@@ -204,6 +262,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       </div>
 
       <Button
+        ref={buttonRef}
         variant="default"
         className={`w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full shadow-xl transform transition-all duration-150 flex items-center justify-center cursor-pointer select-none ${
           isPlaying ? "scale-95" : ""
@@ -211,16 +270,21 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
           error ? "bg-red-600 hover:bg-red-700" : "bg-[#04a0e0] hover:bg-[#038ecf]"
         }`}
         onMouseDown={startAudio}
-        onTouchStart={startAudio}
         onMouseUp={stopAudio}
         onMouseLeave={stopAudio}
-        onTouchEnd={stopAudio}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchCancel}
         disabled={isLoading || !!error || !audioUrl}
         aria-label="Press and hold to play audio"
         style={{
           boxShadow: isPlaying ? '0 0 20px rgba(4, 160, 224, 0.7)' : '0 0 15px rgba(4, 160, 224, 0.4)',
           border: '3px solid rgba(255, 255, 255, 0.4)',
-          zIndex: 20 // Keep button above the fan image
+          zIndex: 20, // Keep button above the fan image
+          WebkitTapHighlightColor: 'transparent', // Remove tap highlight on iOS
+          WebkitTouchCallout: 'none', // Disable callout on long press
+          WebkitUserSelect: 'none', // Disable text selection
+          touchAction: 'manipulation' // Optimize for touch
         }}
       >
         {getButtonContent()}
