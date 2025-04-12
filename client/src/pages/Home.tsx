@@ -110,7 +110,7 @@ export default function Home() {
       <div 
         className="absolute inset-0 w-full h-full"
         style={{ 
-          backgroundImage: 'url(/assets/naples-background-updated.png)',
+          backgroundImage: 'url(/assets/naples-background-new2.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
