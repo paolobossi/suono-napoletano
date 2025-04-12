@@ -3,7 +3,7 @@ import type { Config } from "tailwindcss";
 export default {
   darkMode: ["class"],
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
-  safelist: ['scale-80', 'scale-120'],
+  safelist: ['scale-60', 'scale-140'],
   theme: {
     extend: {
       borderRadius: {
@@ -97,8 +97,10 @@ export default {
         "bounce-slow": "bounce-slow 1s infinite",
       },
       scale: {
+        '60': '0.6',
         '80': '0.8',
         '120': '1.2',
+        '140': '1.4',
       },
     },
   },
