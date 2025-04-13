@@ -20,6 +20,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }));
   
   // Audio endpoint - now using local MP3 file
+  // Special route for ads.txt in the root
+  app.get("/ads.txt", (req, res) => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.send('google.com, pub-1733624280085328, DIRECT, f08c47fec0942fa0');
+  });
+  
   app.get("/api/audio", (req, res) => {
     try {
       // Return the local audio file information with relative path for better compatibility
