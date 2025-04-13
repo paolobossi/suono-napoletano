@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import path from "path";
 
 const app = express();
 app.use(express.json());
@@ -47,6 +48,9 @@ app.use((req, res, next) => {
     throw err;
   });
 
+  // Serve static files from the public directory regardless of environment
+  app.use(express.static(path.resolve(import.meta.dirname, "..", "public")));
+  
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
