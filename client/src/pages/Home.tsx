@@ -125,6 +125,23 @@ export default function Home() {
 
   return (
     <div className="full-viewport w-full overflow-hidden relative">
+      {/* Question mark button - positioned in bottom left corner */}
+      <a 
+        href="/about.html" 
+        className="fixed bottom-4 left-4 w-10 h-10 rounded-full flex items-center justify-center shadow-lg z-50 transition-all hover:scale-110"
+        aria-label="About this app"
+        style={{
+          fontSize: '1.25rem',
+          fontWeight: 'bold',
+          backgroundColor: '#04a0e0',
+          color: 'white',
+          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
+          border: '2px solid rgba(255, 255, 255, 0.4)'
+        }}
+      >
+        ?
+      </a>
+      
       {/* iPhone SE detection status indicator (for debugging) */}
       {process.env.NODE_ENV === 'development' && isIPhoneSE && (
         <div className="fixed top-0 left-0 bg-blue-500 text-white text-xs p-1 z-50">
