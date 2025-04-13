@@ -6,6 +6,12 @@ import { useToast } from "@/hooks/use-toast";
 import fanImage from "../assets/napoli-fan.png";
 import audioFile from "../assets/TarantellaNapoletana.mp3";
 
+// Helper function to detect desktop devices
+const isDesktopDevice = () => {
+  // Check if viewport width is above typical tablet breakpoint (>= 1024px)
+  return window.innerWidth >= 1024;
+};
+
 interface AudioButtonProps {
   audioUrl: string | null;
   isLoading: boolean;
@@ -17,10 +23,47 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isAudioReady, setIsAudioReady] = useState(false);
   const [showFanImage, setShowFanImage] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const touchTimerRef = useRef<number | null>(null);
   const { toast } = useToast();
+  
+  // Check for desktop device on mount and on resize
+  useEffect(() => {
+    // Set initial desktop state
+    const initialDesktopState = isDesktopDevice();
+    setIsDesktop(initialDesktopState);
+    
+    // Log desktop detection for debugging
+    if (initialDesktopState) {
+      console.log('%c 💻 Desktop mode active - larger fan image applied', 'background: #22c55e; color: white; padding: 4px; border-radius: 4px;');
+    }
+    
+    // Update on window resize
+    const handleResize = () => {
+      const newDesktopState = isDesktopDevice();
+      
+      // Only log if there was a change in state
+      if (newDesktopState !== isDesktop) {
+        if (newDesktopState) {
+          console.log('%c 💻 Desktop mode activated - larger fan image applied', 'background: #22c55e; color: white; padding: 4px; border-radius: 4px;');
+        } else {
+          console.log('%c 📱 Mobile mode activated - standard fan image size', 'background: #0ea5e9; color: white; padding: 4px; border-radius: 4px;');
+        }
+      }
+      
+      setIsDesktop(newDesktopState);
+    };
+    
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+    
+    // Clean up
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [isDesktop]); // Add isDesktop to dependencies for proper comparison in handleResize
 
   // Initialize and preload audio with multiple fallback mechanisms
   useEffect(() => {
@@ -280,6 +323,17 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
 
   return (
     <div className="relative flex justify-center items-center w-full">
+      {/* Development mode indicators */}
+      {process.env.NODE_ENV === 'development' && (
+        <>
+          {isDesktop && (
+            <div className="fixed top-0 right-0 bg-green-500 text-white text-xs p-1 z-50">
+              Desktop mode active (fan 1.44x)
+            </div>
+          )}
+        </>
+      )}
+      
       {/* Fan image that slides in from bottom when button is pressed */}
       <div 
         className={`fixed w-full flex justify-center transition-all duration-500 ease-out pointer-events-none`}
@@ -300,8 +354,15 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
           style={{
             filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))',
             display: 'block',
-            // 20% larger on non-iPhone SE devices
-            transform: isIPhoneSE ? 'none' : 'scale(1.2)',
+            // Scale logic: 
+            // - iPhone SE: no scaling
+            // - Regular mobile: 1.2x scaling (20% larger)
+            // - Desktop: 1.44x scaling (20% larger than mobile, which is 1.2 * 1.2 = 1.44)
+            transform: isIPhoneSE 
+              ? 'none' 
+              : isDesktop 
+                ? 'scale(1.44)' // 20% larger than mobile (1.2 * 1.2)
+                : 'scale(1.2)', // 20% larger than base size
           }}
         />
       </div>
