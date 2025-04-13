@@ -1,8 +1,7 @@
-# robots.txt for suononapoletano.com
 User-agent: *
 Allow: /
-Allow: /ads.txt
-Allow: /ads.html
 
-# AdSense verification file location
-Sitemap: https://suononapoletano.com/ads.txt
+# Important - Ads.txt Location Information
+# Our ads.txt file is available at the following locations:
+# /ads.txt
+# /suononapoletano.com/ads.txt

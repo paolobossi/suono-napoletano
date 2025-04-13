@@ -4,6 +4,21 @@ import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
 
 const app = express();
+
+// HIGHEST PRIORITY: Dedicated middleware for ads.txt before any other middleware
+// This ensures ads.txt is always served regardless of other routes
+app.use((req, res, next) => {
+  const adsPath = req.path;
+  // Comprehensive regex to catch all possible ads.txt URLs
+  if (adsPath.endsWith('/ads.txt') || adsPath === '/ads.txt') {
+    console.log('ADS.TXT INTERCEPTOR - serving from URL:', adsPath);
+    res.set('Content-Type', 'text/plain');
+    res.set('Cache-Control', 'public, max-age=86400');
+    return res.send('google.com, pub-1733624280085328, DIRECT, f08c47fec0942fa0');
+  }
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
