@@ -2,10 +2,43 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Ads.txt</title>
+    <title>Ads.txt Content</title>
     <meta http-equiv="refresh" content="0;url=/ads.txt">
+    <style>
+        body {
+            font-family: monospace;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-    google.com, pub-1733624280085328, DIRECT, f08c47fec0942fa0
+    <h1>Ads.txt Content for suononapoletano.com</h1>
+    <p>Below is the content of our ads.txt file:</p>
+    <pre>google.com, pub-1733624280085328, DIRECT, f08c47fec0942fa0</pre>
+    
+    <p>This page automatically redirects to <a href="/ads.txt">/ads.txt</a>.</p>
+    
+    <script>
+    // Script to handle direct content serving if needed
+    if (window.location.href.includes('ads.txt')) {
+        document.body.innerHTML = 'google.com, pub-1733624280085328, DIRECT, f08c47fec0942fa0';
+        document.body.style.fontFamily = 'monospace';
+        document.body.style.padding = '20px';
+    }
+    </script>
 </body>
 </html>

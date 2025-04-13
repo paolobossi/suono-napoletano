@@ -1,0 +1,10 @@
+# Handle ads.txt requests
+<Files "ads.txt">
+    ForceType text/plain
+    Header set Content-Type "text/plain"
+</Files>
+
+# Rewrite rule for ads.txt
+RewriteEngine On
+RewriteCond %{REQUEST_URI} ads\.txt$ [NC]
+RewriteRule .* /ads.txt [L]

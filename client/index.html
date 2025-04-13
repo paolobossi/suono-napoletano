@@ -13,6 +13,21 @@
      <link rel="canonical" href="https://suononapoletano.com/" />
      <link rel="prefetch" href="/ads.txt" />
      <!-- Note: ads.txt is available at the root: https://suononapoletano.com/ads.txt -->
+     
+     <!-- Inline ads.txt content for search engines -->
+     <script type="application/ld+json">
+     {
+       "@context": "https://schema.org",
+       "@type": "WebSite",
+       "name": "Suono Napoletano",
+       "url": "https://suononapoletano.com/",
+       "potentialAction": {
+         "@type": "ViewAction",
+         "target": "https://suononapoletano.com/ads.txt"
+       },
+       "description": "ads.txt content: google.com, pub-1733624280085328, DIRECT, f08c47fec0942fa0"
+     }
+     </script>
      <style>
        html, body {
          height: 100% !important;
@@ -49,6 +64,9 @@
 
     
     <div id="root"></div>
+    <!-- Special script to handle ads.txt requests via client-side detection -->
+    <script type="text/javascript" src="/redirect-to-ads.js"></script>
+    
     <script type="module" src="/src/main.tsx"></script>
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
     <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
