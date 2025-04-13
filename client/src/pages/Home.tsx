@@ -127,7 +127,8 @@ export default function Home() {
     height: '100%',
     // Different vertical offset based on device type
     // For iPhone SE, use smaller offset to keep button in visible area
-    paddingTop: isIPhoneSE ? '5vh' : '9.8vh',
+    // Double the vertical offset as requested (additional 9.8%)
+    paddingTop: isIPhoneSE ? '10vh' : '19.6vh',
   };
 
   return (
