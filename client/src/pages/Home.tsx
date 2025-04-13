@@ -111,7 +111,7 @@ export default function Home() {
   `;
 
   return (
-    <div className="min-h-screen w-full overflow-hidden relative">
+    <div className="full-viewport w-full overflow-hidden relative">
       {/* iPhone SE detection status indicator (for debugging) */}
       {process.env.NODE_ENV === 'development' && isIPhoneSE && (
         <div className="fixed top-0 left-0 bg-blue-500 text-white text-xs p-1 z-50">
@@ -126,7 +126,9 @@ export default function Home() {
           backgroundImage: `url(${backgroundImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
+          backgroundRepeat: 'no-repeat',
+          height: '100%', // Ensure 100% height
+          minHeight: '100%' // Minimum height
         }}
       ></div>
       
