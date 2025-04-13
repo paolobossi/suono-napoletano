@@ -7,22 +7,26 @@
     @apply border-border;
   }
 
-  html, body, #root {
-    height: 100vh;
-    width: 100vw;
+  html, body {
+    @apply font-sans antialiased bg-background text-foreground;
+    height: 100%;
     margin: 0;
     padding: 0;
     overflow: hidden;
   }
 
-  body {
-    @apply font-sans antialiased;
-    background-color: #1E76A6; /* Match the container background color */
+  #root {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
   }
-  
-  .full-viewport {
-    height: 100vh;
-    min-height: 100vh;
-    max-height: 100vh;
-  }
+}
+
+/* Ensure the app fills the entire viewport */
+.full-viewport {
+  min-height: 100vh; /* Fallback */
+  min-height: 100dvh; /* Modern viewport units - dynamic viewport height */
+  width: 100%;
+  overflow: hidden;
 }
