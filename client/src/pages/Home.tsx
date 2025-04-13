@@ -141,7 +141,11 @@ export default function Home() {
       <div 
         className={buttonContainerClasses}
         style={{ 
-          marginTop: '45%' // Default positioning for non-iPhone SE
+          position: 'absolute',
+          top: isIPhoneSE ? '65%' : '75%', // Lower for iPhone SE, 75% for other devices
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 'auto'
         }}
       >
         <AudioButton 
