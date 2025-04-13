@@ -17,10 +17,8 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="h-full w-full">
-        <Router />
-        <Toaster />
-      </div>
+      <Router />
+      <Toaster />
     </QueryClientProvider>
   );
 }
