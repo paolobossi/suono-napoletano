@@ -274,14 +274,12 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
     <div className="relative">
       {/* Fan image that slides in from bottom when button is pressed */}
       <div 
-        className={`fixed bottom-0 w-full flex justify-center items-end transition-all duration-500 ease-out pointer-events-none`}
+        className="fixed bottom-0 left-0 right-0 w-full flex justify-center items-end transition-all duration-500 ease-out pointer-events-none"
         style={{ 
           zIndex: 10,
           transform: showFanImage ? 'translateY(0)' : 'translateY(100%)', // Move fully off-screen when not showing
           opacity: 1,
-          width: '100vw',
-          left: 0,
-          right: 0,
+          width: '100%',
           transition: 'transform 0.5s cubic-bezier(0.17, 0.84, 0.44, 1)'
         }}
       >
