@@ -1,5 +1,5 @@
 /* iPhone SE specific styles */
 .iphone-se-position {
-  /* Now moved 15px higher (25px up, then 10px down) - exactly as requested */
-  transform: translateY(-15px) !important;
+  /* Adjust position for the new cityscape image */
+  transform: translateY(-25px) !important;
 }

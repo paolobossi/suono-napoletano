@@ -2,7 +2,7 @@ import { useState, useEffect, useLayoutEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AudioButton } from "@/components/AudioButton";
 // Import assets directly for reliable loading in production
-import backgroundImage from "../assets/naples-background-new2.png";
+import backgroundImage from "../assets/naples-background-new.png";
 import audioMp3 from "../assets/TarantellaNapoletana.mp3";
 // iPhone SE styles will be imported dynamically when needed
 
@@ -112,7 +112,7 @@ export default function Home() {
   
   // Define desktop-specific button positioning
   const buttonStyle = {
-    marginTop: '45%', // Default positioning for non-iPhone SE
+    marginTop: '70%', // Increased to position in the crowd area for the new image
     position: 'absolute' as const, // Type assertion to fix TypeScript error
     left: 0,
     right: 0,
