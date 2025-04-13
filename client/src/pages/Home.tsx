@@ -15,12 +15,14 @@ interface AudioData {
 
 export default function Home() {
   const [isIPhoneSE, setIsIPhoneSE] = useState(false);
-  
-  // Detect iPhone SE specifically - using useLayoutEffect for faster execution
+  const [isSurfaceDuo, setIsSurfaceDuo] = useState(false);
+
+  // Detect device types - using useLayoutEffect for faster execution
   useLayoutEffect(() => {
-    const checkIfIPhoneSE = () => {
-      // TESTING ONLY: Uncomment to force iPhone SE mode on any device
+    const checkDeviceTypes = () => {
+      // TESTING ONLY: Uncomment to force modes for testing
       // return setIsIPhoneSE(true);
+      // return setIsSurfaceDuo(true);
       
       // Check for iPhone in user agent
       const isIOS = /iPhone|iPod/.test(navigator.userAgent);
@@ -32,22 +34,33 @@ export default function Home() {
         (window.innerWidth === 375 && window.innerHeight === 667)    // 2nd gen
       );
       
+      // Surface Duo has dimensions of 540 x 720 in single screen mode
+      const isSurfaceDuoDimensions = 
+        (window.innerWidth === 540 && window.innerHeight === 720) ||
+        (window.innerHeight === 540 && window.innerWidth === 720);
+      
       // Alternative detection for iPhone SE size range
       const isSmallScreen = window.innerHeight < 700 && window.innerWidth < 400;
       
-      // Explicit test mode from URL parameter
-      const isTestMode = new URLSearchParams(window.location.search).get('iphonese') === '1';
+      // Explicit test mode from URL parameters
+      const isIPhoneSETestMode = new URLSearchParams(window.location.search).get('iphonese') === '1';
+      const isSurfaceDuoTestMode = new URLSearchParams(window.location.search).get('surfaceduo') === '1';
       
       // Always treat actual iPhone SE dimensions as iPhone SE, regardless of userAgent
       const hasExactSEDimensions = 
         (window.innerWidth === 320 && window.innerHeight === 568) || // 1st gen exact match
         (window.innerWidth === 375 && window.innerHeight === 667);   // 2nd gen exact match
         
-      // Determine final result - test mode, exact dimensions, or regular detection
-      const finalResult = isTestMode || hasExactSEDimensions || (isIOS && (isSEDimensions || isSmallScreen));
+      // Determine final results
+      const isPhoneSEResult = isIPhoneSETestMode || hasExactSEDimensions || (isIOS && (isSEDimensions || isSmallScreen));
+      const isSurfaceDuoResult = isSurfaceDuoTestMode || isSurfaceDuoDimensions;
       
-      if (isTestMode) {
+      if (isIPhoneSETestMode) {
         console.log('iPhone SE test mode activated via URL parameter');
+      }
+      
+      if (isSurfaceDuoTestMode) {
+        console.log('Surface Duo test mode activated via URL parameter');
       }
       
       // Log device detection information (helps with debugging)
@@ -59,13 +72,16 @@ export default function Home() {
         isSEDimensions,
         hasExactSEDimensions,
         isSmallScreen,
-        isTestMode,
-        isIPhoneSE: finalResult
+        isSurfaceDuoDimensions,
+        isIPhoneSETestMode,
+        isSurfaceDuoTestMode,
+        isIPhoneSE: isPhoneSEResult,
+        isSurfaceDuo: isSurfaceDuoResult
       });
       
-      // Add a visible indicator in the console when iPhone SE mode is active
-      if (finalResult) {
-        console.log('%c 📱 iPhone SE mode active - button positioned higher', 'background: #04a0e0; color: white; padding: 4px; border-radius: 4px;');
+      // Add a visible indicator in the console for special device modes
+      if (isPhoneSEResult) {
+        console.log('%c 📱 iPhone SE mode active', 'background: #04a0e0; color: white; padding: 4px; border-radius: 4px;');
         
         // Dynamically import iPhone SE specific CSS
         import('@/iphoneSE.css').catch(err => {
@@ -73,17 +89,22 @@ export default function Home() {
         });
       }
       
-      setIsIPhoneSE(finalResult);
+      if (isSurfaceDuoResult) {
+        console.log('%c 📱 Surface Duo mode active', 'background: #7742f5; color: white; padding: 4px; border-radius: 4px;');
+      }
+      
+      setIsIPhoneSE(isPhoneSEResult);
+      setIsSurfaceDuo(isSurfaceDuoResult);
     };
     
     // Initial check
-    checkIfIPhoneSE();
+    checkDeviceTypes();
     
     // Re-check on resize
-    window.addEventListener('resize', checkIfIPhoneSE);
+    window.addEventListener('resize', checkDeviceTypes);
     
     return () => {
-      window.removeEventListener('resize', checkIfIPhoneSE);
+      window.removeEventListener('resize', checkDeviceTypes);
     };
   }, []);
   
@@ -112,7 +133,7 @@ export default function Home() {
   `;
   
   // Define button positioning with improved centering and vertical offset
-  // Move button 9.8% lower from center position (adjusted for iPhone SE)
+  // Move button lower based on device type (special adjustments for Surface Duo)
   const buttonStyle = {
     position: 'absolute' as const, // Type assertion to fix TypeScript error
     left: '50%', // Position from the middle of the screen
@@ -126,9 +147,8 @@ export default function Home() {
     width: '100%',
     height: '100%',
     // Different vertical offset based on device type
-    // Increased vertical position exclusively for iPhone SE as requested
-    // Regular devices stay at 19.6vh (double the original 9.8%)
-    paddingTop: isIPhoneSE ? '19.6vh' : '19.6vh', // Increased iPhone SE to match regular devices
+    // Increased vertical position for Surface Duo as requested (even lower)
+    paddingTop: isSurfaceDuo ? '29.4vh' : '19.6vh', // Surface Duo gets an additional 9.8vh offset
   };
 
   return (
@@ -150,11 +170,20 @@ export default function Home() {
         ?
       </Link>
       
-      {/* iPhone SE detection status indicator (for debugging) */}
-      {process.env.NODE_ENV === 'development' && isIPhoneSE && (
-        <div className="fixed top-0 left-0 bg-blue-500 text-white text-xs p-1 z-50">
-          iPhone SE mode active
-        </div>
+      {/* Device detection indicators (for debugging) */}
+      {process.env.NODE_ENV === 'development' && (
+        <>
+          {isIPhoneSE && (
+            <div className="fixed top-0 left-0 bg-blue-500 text-white text-xs p-1 z-50">
+              iPhone SE mode active
+            </div>
+          )}
+          {isSurfaceDuo && (
+            <div className="fixed top-0 left-0 bg-purple-500 text-white text-xs p-1 z-50">
+              Surface Duo mode active
+            </div>
+          )}
+        </>
       )}
       
       {/* Background Image Container */}
