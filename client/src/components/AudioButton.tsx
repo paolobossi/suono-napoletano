@@ -37,7 +37,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
     
     // Log desktop detection for debugging
     if (initialDesktopState) {
-      console.log('%c 💻 Desktop mode active - fan image 2x size', 'background: #22c55e; color: white; padding: 4px; border-radius: 4px;');
+      console.log('%c 💻 Desktop mode active - fan image 320px width', 'background: #22c55e; color: white; padding: 4px; border-radius: 4px;');
     }
     
     // Update on window resize
@@ -47,9 +47,9 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       // Only log if there was a change in state
       if (newDesktopState !== isDesktop) {
         if (newDesktopState) {
-          console.log('%c 💻 Desktop mode activated - fan image 2x size', 'background: #22c55e; color: white; padding: 4px; border-radius: 4px;');
+          console.log('%c 💻 Desktop mode activated - fan image 320px width', 'background: #22c55e; color: white; padding: 4px; border-radius: 4px;');
         } else {
-          console.log('%c 📱 Mobile mode activated - fan image 1.2x size', 'background: #0ea5e9; color: white; padding: 4px; border-radius: 4px;');
+          console.log('%c 📱 Mobile mode activated - fan image ' + (isIPhoneSE ? '208px' : '256px') + ' width', 'background: #0ea5e9; color: white; padding: 4px; border-radius: 4px;');
         }
       }
       
@@ -328,7 +328,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         <>
           {isDesktop && (
             <div className="fixed top-0 right-0 bg-green-500 text-white text-xs p-1 z-50">
-              Desktop mode active (fan 2.0x)
+              Desktop mode active (fan 320px width)
             </div>
           )}
         </>
@@ -350,19 +350,18 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         <img 
           src={fanImage} 
           alt="Napoli Fan"
-          className={`${isIPhoneSE ? 'w-52' : 'w-64'} h-auto object-contain ${showFanImage ? 'animate-bounce-slow' : ''}`}
+          className={`h-auto object-contain ${showFanImage ? 'animate-bounce-slow' : ''}`}
           style={{
             filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))',
             display: 'block',
-            // Scale logic: 
-            // - iPhone SE: no scaling
-            // - Regular mobile: 1.2x scaling (20% larger)
-            // - Desktop: 2.0x scaling (100% larger/twice the base size)
-            transform: isIPhoneSE 
-              ? 'none' 
-              : isDesktop 
-                ? 'scale(2.0)' // Much larger on desktop (twice the base size)
-                : 'scale(1.2)', // 20% larger than base size
+            // Desktop: fixed 320px width
+            // iPhone SE: smaller size (w-52 = 13rem = 208px)
+            // Regular mobile: medium size (w-64 = 16rem = 256px)
+            width: isDesktop 
+              ? '320px' 
+              : isIPhoneSE 
+                ? '208px' // 13rem (w-52)
+                : '256px', // 16rem (w-64)
           }}
         />
       </div>
