@@ -37,6 +37,14 @@ cp ./public/ads.html ./client/dist/client/ads.html
 mkdir -p ./public_html
 echo "$ADSENSE_CONTENT" > ./public_html/ads.txt
 
+# Create the exact URL path structure from the screenshot
+mkdir -p ./public/suononapoletano.com
+echo "$ADSENSE_CONTENT" > ./public/suononapoletano.com/ads.txt
+
+# Also create it in dist client
+mkdir -p ./client/dist/client/suononapoletano.com
+echo "$ADSENSE_CONTENT" > ./client/dist/client/suononapoletano.com/ads.txt
+
 # Display success message
 echo "ads.txt has been written to all necessary locations for deployment"
 
@@ -44,7 +52,8 @@ echo "ads.txt has been written to all necessary locations for deployment"
 echo ""
 echo "After deployment, please test ALL of these URLs:"
 echo "1. curl -L https://suononapoletano.com/ads.txt"
-echo "2. curl -L https://suononapoletano.com/ads.html"
+echo "2. curl -L https://suononapoletano.com/ads.html" 
 echo "3. curl -L https://suononapoletano.com/public/ads.txt"
+echo "4. curl -L https://suononapoletano.com/suononapoletano.com/ads.txt"
 echo ""
 echo "At least one of these should work. If none do, you need to contact Replit support."

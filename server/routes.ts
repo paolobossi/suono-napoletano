@@ -20,12 +20,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }));
   
   // Audio endpoint - now using local MP3 file
-  // Multiple routes for ads.txt to ensure it's accessible from different paths
-  app.get(["/ads.txt", "*/ads.txt", "/*/ads.txt"], (req, res) => {
+  // HIGHEST PRIORITY ROUTE: Dedicated route handler for ads.txt with explicit content
+  app.get(["/ads.txt", "*/ads.txt", "/*/ads.txt", "/public/ads.txt"], (req, res) => {
     // Log the ads.txt request for debugging
     console.log('Serving ads.txt from path:', req.path);
-    res.setHeader('Content-Type', 'text/plain');
-    res.sendFile(path.join(process.cwd(), 'ads.txt')); // Serve from root directory
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 1 day
+    // DIRECTLY WRITE THE CONTENT instead of serving a file that might not be accessible
+    return res.send('google.com, pub-1733624280085328, DIRECT, f08c47fec0942fa0');
+  });
+
+  // HTML fallback for ads.txt
+  app.get(["/ads.html", "/public/ads.html"], (req, res) => {
+    console.log('Serving ads.html from path:', req.path);
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(`<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Ads.txt</title>
+</head>
+<body>
+    <pre>google.com, pub-1733624280085328, DIRECT, f08c47fec0942fa0</pre>
+</body>
+</html>`);
   });
   
   app.get("/api/audio", (req, res) => {
@@ -51,11 +69,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return next();
     }
     
-    // Handle ads.txt at any path level for compatibility with domain.com/ads.txt
-    if (req.path.endsWith('/ads.txt')) {
-      res.setHeader('Content-Type', 'text/plain');
-      return res.sendFile(path.join(process.cwd(), 'ads.txt'));
-    }
+    // This fallback handler for ads.txt has been moved to the main route handler above
+    // We don't need it here anymore, as the dedicated route should handle it better
     
     // If this is a deployment, use special handling
     try {
