@@ -353,7 +353,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       <Button
         ref={buttonRef}
         variant="default"
-        className={`w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full shadow-xl transform transition-all duration-150 flex items-center justify-center cursor-pointer select-none pointer-events-auto ${
+        className={`w-28 h-28 sm:w-28 sm:h-28 md:w-28 md:h-28 rounded-full shadow-xl transform transition-all duration-150 flex items-center justify-center cursor-pointer select-none pointer-events-auto ${
           isPlaying ? "scale-95" : ""
         } ${
           error ? "bg-red-600 hover:bg-red-700" : "bg-[#04a0e0] hover:bg-[#038ecf]"
