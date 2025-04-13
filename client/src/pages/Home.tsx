@@ -107,24 +107,22 @@ export default function Home() {
   
   // Create dynamic classes based on device detection
   const buttonContainerClasses = `
-    flex items-center justify-center pointer-events-none w-full
-    ${isIPhoneSE ? 'iphone-se-position' : ''}
+    flex items-center justify-center pointer-events-none w-full h-full
   `;
   
   // Define desktop-specific button positioning
   const buttonStyle = {
-    marginTop: '70%', // Increased to position in the crowd area for the new image
     position: 'absolute' as const, // Type assertion to fix TypeScript error
     left: 0,
     right: 0,
     top: 0,
     bottom: 0,
-    // The button container should only affect the background image area on desktop
-    width: '100%',
-    maxWidth: '100%',
+    // Center the button in the middle of the screen
     display: 'flex',
     justifyContent: 'center', // Center horizontally
     alignItems: 'center', // Center vertically
+    width: '100%',
+    height: '100%',
   };
 
   return (
