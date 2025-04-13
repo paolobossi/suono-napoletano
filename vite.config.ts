@@ -29,6 +29,11 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
-    assetsDir: "assets"
+    assetsDir: "assets",
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    }
   },
 });
