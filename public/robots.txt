@@ -1,7 +1,5 @@
 User-agent: *
 Allow: /
 
-# Important - Ads.txt Location Information
-# Our ads.txt file is available at the following locations:
-# /ads.txt
-# /suononapoletano.com/ads.txt
+# Ads.txt Information
+Sitemap: https://suononapoletano.com/ads.txt
