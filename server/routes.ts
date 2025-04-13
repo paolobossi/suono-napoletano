@@ -17,28 +17,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }));
 
   // Dedicated route for ads.txt (Google AdSense verification)
-  app.get(['/ads.txt', '/public/ads.txt'], (req, res) => {
-    console.log(`Serving ads.txt from path: ${req.path}`);
-    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=86400');
-    res.send('google.com, pub-1733624280085328, DIRECT, f08c47fec0942fa0');
-  });
-
-  // HTML fallback to preview ads.txt in browser
-  app.get(['/ads.html', '/public/ads.html'], (req, res) => {
-    console.log('Serving ads.html from path:', req.path);
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.send(`<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Ads.txt</title>
-</head>
-<body>
-    <pre>google.com, pub-1733624280085328, DIRECT, f08c47fec0942fa0</pre>
-</body>
-</html>`);
-  });
+  // Note: ads.txt handling has been moved to a specialized middleware in ads-handler.ts
+  // This ensures it's handled at the highest priority level before any route matching
 
   // API endpoint for the audio file
   app.get("/api/audio", (req, res) => {
