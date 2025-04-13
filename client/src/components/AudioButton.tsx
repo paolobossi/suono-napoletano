@@ -277,7 +277,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         className={`fixed w-full flex justify-center transition-all duration-500 ease-out pointer-events-none`}
         style={{ 
           zIndex: 10,
-          bottom: showFanImage ? '0px' : '-100vh',  // Completely off screen when not showing
+          bottom: showFanImage ? '0' : '-100vh',  // Completely off screen when not showing, aligned with bottom when visible
           opacity: 1,
           width: '100vw',
           left: '50%',
@@ -292,8 +292,12 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
           style={{
             filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))',
             display: 'block',
+            marginBottom: '0',
             // 20% larger on non-iPhone SE devices
             transform: isIPhoneSE ? 'none' : 'scale(1.2)',
+            // Ensure image stays at the bottom
+            position: 'relative',
+            bottom: '0'
           }}
         />
       </div>
