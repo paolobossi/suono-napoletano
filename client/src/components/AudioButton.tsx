@@ -288,11 +288,11 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         <img 
           src={fanImage} 
           alt="Napoli Fan"
-          className={`${isIPhoneSE ? 'w-52' : 'w-64 md:w-[402px]'} h-auto object-contain ${showFanImage ? 'animate-bounce-slow' : ''}`}
+          className={`${isIPhoneSE ? 'w-52' : 'w-64'} h-auto object-contain ${showFanImage ? 'animate-bounce-slow' : ''}`}
           style={{
             filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))',
             display: 'block',
-            // Specific scaling for different devices
+            // 20% larger on non-iPhone SE devices
             transform: isIPhoneSE ? 'none' : 'scale(1.2)',
           }}
         />
