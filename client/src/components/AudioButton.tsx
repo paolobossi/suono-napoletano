@@ -249,7 +249,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         }}
       >
         <img 
-          src="/assets/napoli-fan.png" 
+          src="./assets/napoli-fan.png" 
           alt="Napoli Fan"
           className={`${isIPhoneSE ? 'w-52' : 'w-64'} h-auto object-contain ${showFanImage ? 'animate-bounce-slow' : ''}`}
           style={{
