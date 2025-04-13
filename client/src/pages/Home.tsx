@@ -104,11 +104,14 @@ export default function Home() {
   const isLoading = false; // We're using local import, so no loading state needed
   const error = null; // Using local import to avoid errors
   
-  // Calculate position based on device detection
-  const buttonPositionTop = isIPhoneSE ? '40%' : '58%';
+  // Create dynamic classes based on device detection
+  const buttonContainerClasses = `
+    absolute inset-0 flex items-center justify-center
+    ${isIPhoneSE ? 'iphone-se-position' : ''}
+  `;
 
   return (
-    <div className="full-viewport w-full overflow-hidden relative flex items-center justify-center">
+    <div className="full-viewport w-full overflow-hidden relative">
       {/* iPhone SE detection status indicator (for debugging) */}
       {process.env.NODE_ENV === 'development' && isIPhoneSE && (
         <div className="fixed top-0 left-0 bg-blue-500 text-white text-xs p-1 z-50">
@@ -116,41 +119,37 @@ export default function Home() {
         </div>
       )}
       
-      {/* Container that wraps both the background image and button */}
-      <div className="relative" style={{ width: 'auto', height: 'auto', maxHeight: '100vh' }}>
-        {/* Background Image */}
-        <img 
-          src={backgroundImage}
-          alt="Naples Background"
-          className="max-h-screen"
-          style={{ 
-            display: 'block',
-            objectFit: 'contain',  
-            maxWidth: '100%',
-            maxHeight: '100vh',
-            height: 'auto',
-            width: 'auto',
-            backgroundColor: '#1E76A6' // Match the image background color
-          }}
+      {/* Background Image - Using an img tag for better control */}
+      <img 
+        src={backgroundImage}
+        alt="Naples Background"
+        className="absolute inset-0"
+        style={{ 
+          objectFit: 'contain', // Maintain aspect ratio without stretching
+          objectPosition: 'center',
+          height: '100vh', // Use viewport height
+          width: '100vw', // Use viewport width
+          maxWidth: '100%',
+          maxHeight: '100vh',
+          margin: '0 auto', // Center horizontally
+          display: 'block',
+          backgroundColor: '#1E76A6' // Match the image background color
+        }}
+      />
+      
+      {/* Button Container - positioned to align with the grey area */}
+      <div 
+        className={buttonContainerClasses}
+        style={{ 
+          marginTop: '45%' // Default positioning for non-iPhone SE
+        }}
+      >
+        <AudioButton 
+          audioUrl={audioUrlToUse} 
+          isLoading={isLoading} 
+          error={error}
+          isIPhoneSE={isIPhoneSE}
         />
-        
-        {/* Button Container - positioned relative to the image container */}
-        <div 
-          className="absolute"
-          style={{ 
-            top: buttonPositionTop, // Use the calculated position
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex: 10
-          }}
-        >
-          <AudioButton 
-            audioUrl={audioUrlToUse} 
-            isLoading={isLoading} 
-            error={error}
-            isIPhoneSE={isIPhoneSE}
-          />
-        </div>
       </div>
     </div>
   );
