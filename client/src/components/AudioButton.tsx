@@ -271,7 +271,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
   };
 
   return (
-    <div className="relative">
+    <div className="relative flex justify-center items-center">
       {/* Fan image that slides in from bottom when button is pressed */}
       <div 
         className={`fixed w-full flex justify-center transition-all duration-500 ease-out pointer-events-none`}

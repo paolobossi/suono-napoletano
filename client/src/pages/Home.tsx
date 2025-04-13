@@ -107,7 +107,7 @@ export default function Home() {
   
   // Create dynamic classes based on device detection
   const buttonContainerClasses = `
-    flex items-center justify-center pointer-events-none
+    flex items-center justify-center pointer-events-none w-full
     ${isIPhoneSE ? 'iphone-se-position' : ''}
   `;
   
@@ -122,6 +122,9 @@ export default function Home() {
     // The button container should only affect the background image area on desktop
     width: '100%',
     maxWidth: '100%',
+    display: 'flex',
+    justifyContent: 'center', // Center horizontally
+    alignItems: 'center', // Center vertically
   };
 
   return (
