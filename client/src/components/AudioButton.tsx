@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Play, Volume2, AlertCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 // Import assets directly for reliable loading in production
 import fanImage from "../assets/napoli-fan.png";
 import audioFile from "../assets/TarantellaNapoletana.mp3";
@@ -27,7 +26,6 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const touchTimerRef = useRef<number | null>(null);
-  const { toast } = useToast();
   
   // Check for desktop device on mount and on resize
   useEffect(() => {
@@ -63,7 +61,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, [isDesktop]); // Add isDesktop to dependencies for proper comparison in handleResize
+  }, [isDesktop, isIPhoneSE]); // Add isDesktop to dependencies for proper comparison in handleResize
 
   // Initialize and preload audio with multiple fallback mechanisms
   useEffect(() => {
@@ -102,12 +100,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       
       fallbackAudio.addEventListener("error", (fallbackErr) => {
         console.error("Fallback audio also failed:", fallbackErr);
-        // If all fails, show error toast
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "There was a problem loading the audio. Please try again.",
-        });
+        // No toast notification, just log the error
       });
       
       // Attempt to load the fallback
@@ -140,7 +133,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         setIsAudioReady(false);
       }
     };
-  }, [toast, audioUrl]);
+  }, [audioUrl]);
 
   // Function to handle starting audio playback
   const startAudio = () => {
@@ -178,20 +171,11 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
             // Hide fan image on error
             setShowFanImage(false);
             
-            // Handle autoplay policy errors specifically (common first-click issue)
+            // Just log the error, no toast notification
             if (err.name === 'NotAllowedError') {
-              toast({
-                title: "Autoplay blocked",
-                description: "Please try clicking again to play the audio.",
-                duration: 3000,
-              });
+              console.warn("Autoplay blocked - please try clicking again");
             } else {
-              toast({
-                variant: "destructive",
-                title: "Playback Error",
-                description: "Could not play the audio. Please try again.",
-                duration: 3000,
-              });
+              console.error("Could not play the audio. Please try again.");
             }
           });
       } else {
