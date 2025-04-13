@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Play, Volume2, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+// Import fan image directly for reliable loading in production
+import fanImage from "../assets/napoli-fan.png";
 
 interface AudioButtonProps {
   audioUrl: string | null;
@@ -249,7 +251,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         }}
       >
         <img 
-          src="./assets/napoli-fan.png" 
+          src={fanImage} 
           alt="Napoli Fan"
           className={`${isIPhoneSE ? 'w-52' : 'w-64'} h-auto object-contain ${showFanImage ? 'animate-bounce-slow' : ''}`}
           style={{

@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
+// Import audio directly for reliable loading in production
+import audioFileUrl from '../assets/TarantellaNapoletana.mp3';
 
-export function useAudio(url: string | null) {
+// Still accept URL as parameter for backward compatibility but prefer direct import
+export function useAudio(url: string | null = null) {
+  // Use the imported audio file if no URL is provided
+  const actualUrl = url || audioFileUrl;
   const [playing, setPlaying] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -12,15 +17,23 @@ export function useAudio(url: string | null) {
       audioRef.current.src = "";
     }
 
-    // Create new audio element if we have a URL
-    if (url) {
-      const audio = new Audio(url);
-      audio.addEventListener('error', (e) => {
-        setError(new Error('Failed to load audio'));
-        console.error('Audio loading error:', e);
-      });
-      audioRef.current = audio;
-    }
+    // Create new audio element with URL or imported file
+    const audio = new Audio(actualUrl);
+    
+    // Log the source being used for debugging
+    console.log("Setting audio source:", actualUrl);
+    
+    audio.addEventListener('error', (e) => {
+      setError(new Error('Failed to load audio'));
+      console.error('Audio loading error:', e);
+    });
+    
+    // Add loaded event to confirm when audio is ready
+    audio.addEventListener('canplaythrough', () => {
+      console.log("Audio is ready to play");
+    });
+    
+    audioRef.current = audio;
 
     // Cleanup on unmount
     return () => {
@@ -30,10 +43,10 @@ export function useAudio(url: string | null) {
         audioRef.current = null;
       }
     };
-  }, [url]);
+  }, [actualUrl]);
 
   const play = () => {
-    if (!audioRef.current || !url) return;
+    if (!audioRef.current) return;
     
     try {
       audioRef.current.currentTime = 0;
