@@ -30,3 +30,47 @@
   width: 100%;
   overflow: hidden;
 }
+
+/* Desktop-specific styles */
+@media (min-width: 768px) {
+  /* Background image container on desktop */
+  .background-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    background-color: #1a1a1a; /* Dark background for the non-image area */
+  }
+
+  /* Background image wrapper to constrain width on desktop */
+  .background-image {
+    height: 100%;
+    /* Width constrained to maintain mobile aspect ratio on desktop */
+    max-width: min(calc(100vh * 0.5625), 100%); /* 9:16 aspect ratio constrained by viewport height */
+    margin: 0 auto;
+    position: relative;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+  }
+  
+  /* Ensure the button's container is properly aligned with the background image */
+  .button-container {
+    width: 100% !important;
+    max-width: min(calc(100vh * 0.5625), 100%) !important; /* Match the background image width */
+    margin: 0 auto !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+}
+
+/* Extra large desktop screens */
+@media (min-width: 1440px) {
+  .background-image {
+    /* On very large screens, don't let it get too wide */
+    max-width: min(calc(100vh * 0.5625), 540px); 
+  }
+  
+  .button-container {
+    max-width: min(calc(100vh * 0.5625), 540px) !important;
+  }
+}

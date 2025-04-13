@@ -106,9 +106,22 @@ export default function Home() {
   
   // Create dynamic classes based on device detection
   const buttonContainerClasses = `
-    absolute inset-0 flex items-center justify-center
+    flex items-center justify-center pointer-events-none
     ${isIPhoneSE ? 'iphone-se-position' : ''}
   `;
+  
+  // Define desktop-specific button positioning
+  const buttonStyle = {
+    marginTop: '45%', // Default positioning for non-iPhone SE
+    position: 'absolute' as const, // Type assertion to fix TypeScript error
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    // The button container should only affect the background image area on desktop
+    width: '100%',
+    maxWidth: '100%',
+  };
 
   return (
     <div className="full-viewport w-full overflow-hidden relative">
@@ -119,25 +132,25 @@ export default function Home() {
         </div>
       )}
       
-      {/* Background Image */}
-      <div 
-        className="absolute inset-0 w-full h-full"
-        style={{ 
-          backgroundImage: `url(${backgroundImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          height: '100%', // Ensure 100% height
-          minHeight: '100%' // Minimum height
-        }}
-      ></div>
+      {/* Background Image Container */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden background-container">
+        {/* Background Image with desktop width constraint */}
+        <div 
+          className="background-image w-full"
+          style={{ 
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            height: '100%',
+          }}
+        ></div>
+      </div>
       
       {/* Button Container - positioned to align with the grey area */}
       <div 
-        className={buttonContainerClasses}
-        style={{ 
-          marginTop: '45%' // Default positioning for non-iPhone SE
-        }}
+        className={`${buttonContainerClasses} z-10 button-container`}
+        style={buttonStyle}
       >
         <AudioButton 
           audioUrl={audioUrlToUse} 
