@@ -111,19 +111,23 @@ export default function Home() {
     flex items-center justify-center pointer-events-none w-full h-full mx-auto
   `;
   
-  // Define desktop-specific button positioning with improved centering
+  // Define button positioning with improved centering and vertical offset
+  // Move button 9.8% lower from center position (adjusted for iPhone SE)
   const buttonStyle = {
     position: 'absolute' as const, // Type assertion to fix TypeScript error
     left: '50%', // Position from the middle of the screen
     transform: 'translateX(-50%)', // Center the element itself
     top: 0,
     bottom: 0,
-    // Center the button in the middle of the screen
+    // Center the button in the middle of the screen with vertical offset
     display: 'flex',
     justifyContent: 'center', // Center horizontally
     alignItems: 'center', // Center vertically
     width: '100%',
     height: '100%',
+    // Different vertical offset based on device type
+    // For iPhone SE, use smaller offset to keep button in visible area
+    paddingTop: isIPhoneSE ? '5vh' : '9.8vh',
   };
 
   return (
