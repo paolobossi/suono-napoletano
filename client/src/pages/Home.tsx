@@ -119,23 +119,18 @@ export default function Home() {
         </div>
       )}
       
-      {/* Background Image - Using an img tag for better control */}
-      <img 
-        src={backgroundImage}
-        alt="Naples Background"
-        className="absolute inset-0"
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 w-full h-full"
         style={{ 
-          objectFit: 'contain', // Maintain aspect ratio without stretching
-          objectPosition: 'center',
-          height: '100vh', // Use viewport height
-          width: '100vw', // Use viewport width
-          maxWidth: '100%',
-          maxHeight: '100vh',
-          margin: '0 auto', // Center horizontally
-          display: 'block',
-          backgroundColor: '#1E76A6' // Match the image background color
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          height: '100%', // Ensure 100% height
+          minHeight: '100%' // Minimum height
         }}
-      />
+      ></div>
       
       {/* Button Container - positioned to align with the grey area */}
       <div 
