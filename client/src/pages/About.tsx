@@ -8,7 +8,14 @@ export default function About() {
         
         <div className="space-y-6 text-gray-700">
           <p className="text-base md:text-lg">
-            Questo sito è ispirato a <span className="font-semibold text-[#04a0e0]">La Zanzara</span>, 
+            Questo sito è ispirato a <a 
+              href="https://www.radio24.ilsole24ore.com/programmi/lazanzara" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="font-semibold text-[#04a0e0] hover:underline"
+            >
+              La Zanzara
+            </a>, 
             programma radiofonico in onda su <span className="font-semibold text-[#04a0e0]">Radio 24</span>. 
             Non vi è alcun legame o affiliazione ufficiale con Radio 24 o con lo show.
           </p>
@@ -34,7 +41,7 @@ export default function About() {
             to="/" 
             className="inline-block bg-[#04a0e0] hover:bg-[#038ecf] text-white font-medium py-3 px-6 rounded-full transition-all transform hover:scale-105 hover:-translate-y-1 border-2 border-white/40 shadow-md"
           >
-            Torna al Lettore Musicale
+            Torna alla home
           </Link>
         </div>
       </div>
