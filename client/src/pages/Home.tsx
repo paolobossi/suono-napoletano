@@ -1,5 +1,6 @@
 import { useState, useEffect, useLayoutEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { AudioButton } from "@/components/AudioButton";
 // Import assets directly for reliable loading in production
 import backgroundImage from "../assets/naples-background-new.png";
@@ -126,8 +127,8 @@ export default function Home() {
   return (
     <div className="full-viewport w-full overflow-hidden relative">
       {/* Question mark button - positioned in bottom left corner */}
-      <a 
-        href="/about.html" 
+      <Link 
+        href="/about" 
         className="fixed bottom-4 left-4 w-10 h-10 rounded-full flex items-center justify-center shadow-lg z-50 transition-all hover:scale-110"
         aria-label="About this app"
         style={{
@@ -140,7 +141,7 @@ export default function Home() {
         }}
       >
         ?
-      </a>
+      </Link>
       
       {/* iPhone SE detection status indicator (for debugging) */}
       {process.env.NODE_ENV === 'development' && isIPhoneSE && (
