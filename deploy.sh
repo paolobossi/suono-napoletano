@@ -60,6 +60,12 @@ if [ -d "/etc/nginx/conf.d" ]; then
   echo "$ADSENSE_CONTENT" | sudo tee /etc/nginx/html/ads.txt
 fi
 
+# Copy favicon to all necessary locations
+cp ./client/public/favicon.png ./public/favicon.png
+cp ./client/public/favicon.png ./client/dist/client/favicon.png
+cp ./client/public/favicon.png ./static/favicon.png
+echo "Copied favicon to all necessary locations"
+
 # Client-side JavaScript approach - create a redirect handler
 mkdir -p ./client/public
 cat > ./client/public/redirect-to-ads.js << EOL
