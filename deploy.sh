@@ -5,15 +5,27 @@
 # Make sure we're in the project root directory
 cd "$(dirname "$0")"
 
-# Create a directory for ads.txt and other public files in the root of the site
-mkdir -p ./ads
+# Ensure ads.txt is in the root directory for deployment
+if [ ! -f "./ads.txt" ]; then
+  echo "Error: ads.txt not found in the root directory"
+  exit 1
+fi
 
-# Copy the ads.txt file to the ads directory
-cp ./public/ads.txt ./ads/
+# Make sure it's also copied to other locations for redundancy
+# In public directory
+mkdir -p ./public
+cp ./ads.txt ./public/ads.txt
+
+# Make sure it's included in the client dist directory
+mkdir -p ./client/dist/client
+cp ./ads.txt ./client/dist/client/ads.txt
 
 # Display success message
-echo "ads.txt has been copied to the site root for deployment"
+echo "ads.txt has been copied to all necessary locations for deployment"
 
-# Note: This script should be run manually before deployment
-# After deployment, make sure your hosting service is configured
-# to serve the ads.txt file from the root of your domain.
+# IMPORTANT: For Replit deployments, make sure to:
+# 1. Set up proper routing in server/routes.ts (already done)
+# 2. Make a direct GET request to the site root:
+echo ""
+echo "After deployment, please test with: curl -L https://suononapoletano.com/ads.txt"
+echo "It should return: google.com, pub-1733624280085328, DIRECT, f08c47fec0942fa0"

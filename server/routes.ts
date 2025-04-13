@@ -20,8 +20,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }));
   
   // Audio endpoint - now using local MP3 file
-  // Special route for ads.txt in the root - serving the file directly
-  app.get("/ads.txt", (req, res) => {
+  // Multiple routes for ads.txt to ensure it's accessible from different paths
+  app.get(["/ads.txt", "*/ads.txt", "/*/ads.txt"], (req, res) => {
+    // Log the ads.txt request for debugging
+    console.log('Serving ads.txt from path:', req.path);
     res.setHeader('Content-Type', 'text/plain');
     res.sendFile(path.join(process.cwd(), 'ads.txt')); // Serve from root directory
   });
