@@ -76,7 +76,15 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
     
     // Start preloading - Use imported audio file directly as primary source
     audio.preload = "auto";
-    audio.src = audioFile;
+    
+    // Check if audioUrl is provided (from props) and use it if available
+    if (audioUrl) {
+      audio.src = audioUrl;
+    } else {
+      // Fallback to the imported audio file
+      audio.src = audioFile;
+    }
+    
     audio.load();
     
     // Store reference
@@ -89,7 +97,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         setIsAudioReady(false);
       }
     };
-  }, [toast]);
+  }, [toast, audioUrl]);
 
   // Function to handle starting audio playback
   const startAudio = () => {
@@ -271,7 +279,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
   };
 
   return (
-    <div className="relative flex justify-center items-center">
+    <div className="relative flex justify-center items-center w-full">
       {/* Fan image that slides in from bottom when button is pressed */}
       <div 
         className={`fixed w-full flex justify-center transition-all duration-500 ease-out pointer-events-none`}

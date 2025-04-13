@@ -100,14 +100,15 @@ export default function Home() {
   // Use local audio file for reliability in deployment
   const [localAudioReady, setLocalAudioReady] = useState(true);
   
-  // Determine the audio URL to use - prefer imported file for reliability
+  // Ensure the audio URL is correctly using the imported audio file
+  console.log("Home component: Using audio file path:", audioMp3);
   const audioUrlToUse = audioMp3;
   const isLoading = false; // We're using local import, so no loading state needed
   const error = null; // Using local import to avoid errors
   
   // Create dynamic classes based on device detection
   const buttonContainerClasses = `
-    flex items-center justify-center pointer-events-none w-full h-full
+    flex items-center justify-center pointer-events-none w-full h-full mx-auto
   `;
   
   // Define desktop-specific button positioning with improved centering
