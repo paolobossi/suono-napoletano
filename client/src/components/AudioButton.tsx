@@ -22,10 +22,9 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
   const touchTimerRef = useRef<number | null>(null);
   const { toast } = useToast();
 
-  // Initialize and preload audio - using direct import for deployment reliability
+  // Initialize and preload audio with multiple fallback mechanisms
   useEffect(() => {
-    // Create new audio element using the directly imported audio file
-    // This ensures it works in production deployment
+    // Create new audio element
     const audio = new Audio();
     
     // Set up event listeners for preloading
@@ -34,21 +33,48 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       console.log("Audio is ready to play");
     });
     
+    // Special error handler with fallbacks
     audio.addEventListener("error", (e) => {
       console.error("Audio loading error:", e);
-      console.error("Audio error code:", (e.target as HTMLAudioElement).error?.code);
-      console.error("Audio error message:", (e.target as HTMLAudioElement).error?.message);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "There was a problem loading the audio.",
+      const errorCode = (e.target as HTMLAudioElement).error?.code;
+      const errorMsg = (e.target as HTMLAudioElement).error?.message;
+      console.error("Audio error code:", errorCode);
+      console.error("Audio error message:", errorMsg);
+      
+      // Try fallback approach for deployment
+      console.log("Trying fallback audio source");
+      
+      // First fallback: try using /TarantellaNapoletana.mp3 from public folder
+      const fallbackUrl = "/TarantellaNapoletana.mp3";
+      
+      // Create a new audio element for fallback
+      const fallbackAudio = new Audio(fallbackUrl);
+      
+      fallbackAudio.addEventListener("canplaythrough", () => {
+        console.log("Fallback audio loaded successfully");
+        setIsAudioReady(true);
+        // Replace the main audio reference
+        audioRef.current = fallbackAudio;
       });
+      
+      fallbackAudio.addEventListener("error", (fallbackErr) => {
+        console.error("Fallback audio also failed:", fallbackErr);
+        // If all fails, show error toast
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "There was a problem loading the audio. Please try again.",
+        });
+      });
+      
+      // Attempt to load the fallback
+      fallbackAudio.load();
     });
     
-    // Log the source being used
+    // Log the primary source being used
     console.log("Using audio source from import:", audioFile);
     
-    // Start preloading - Use imported audio file directly
+    // Start preloading - Use imported audio file directly as primary source
     audio.preload = "auto";
     audio.src = audioFile;
     audio.load();

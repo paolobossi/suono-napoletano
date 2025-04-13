@@ -1,8 +1,9 @@
 import { useState, useEffect, useLayoutEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AudioButton } from "@/components/AudioButton";
-// Import the background image for reliable loading in production
+// Import assets directly for reliable loading in production
 import backgroundImage from "../assets/naples-background-new2.png";
+import audioMp3 from "../assets/TarantellaNapoletana.mp3";
 // iPhone SE styles will be imported dynamically when needed
 
 interface AudioData {
@@ -85,14 +86,24 @@ export default function Home() {
     };
   }, []);
   
+  // We'll still make the API query for backward compatibility,
+  // but we'll also directly use the imported audio file for deployment reliability
   const {
     data: audioData,
-    isLoading,
-    error,
+    isLoading: apiLoading,
+    error: apiError,
   } = useQuery<AudioData>({
     queryKey: ["/api/audio"],
   });
 
+  // Use local audio file for reliability in deployment
+  const [localAudioReady, setLocalAudioReady] = useState(true);
+  
+  // Determine the audio URL to use - prefer imported file for reliability
+  const audioUrlToUse = audioMp3;
+  const isLoading = false; // We're using local import, so no loading state needed
+  const error = null; // Using local import to avoid errors
+  
   // Create dynamic classes based on device detection
   const buttonContainerClasses = `
     absolute inset-0 flex items-center justify-center
@@ -127,9 +138,9 @@ export default function Home() {
         }}
       >
         <AudioButton 
-          audioUrl={audioData?.url || null} 
+          audioUrl={audioUrlToUse} 
           isLoading={isLoading} 
-          error={error ? (error as Error).message : null}
+          error={error}
           isIPhoneSE={isIPhoneSE}
         />
       </div>
