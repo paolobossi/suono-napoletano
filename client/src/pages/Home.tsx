@@ -1,6 +1,8 @@
 import { useState, useEffect, useLayoutEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AudioButton } from "@/components/AudioButton";
+// Import the background image for reliable loading in production
+import backgroundImage from "../assets/naples-background-new2.png";
 // iPhone SE styles will be imported dynamically when needed
 
 interface AudioData {
@@ -110,7 +112,7 @@ export default function Home() {
       <div 
         className="absolute inset-0 w-full h-full"
         style={{ 
-          backgroundImage: 'url(./assets/naples-background-new2.png)',
+          backgroundImage: `url(${backgroundImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
