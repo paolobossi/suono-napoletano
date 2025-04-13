@@ -119,23 +119,32 @@ export default function Home() {
         </div>
       )}
       
-      {/* Background Image - Using an img tag for better control */}
-      <img 
-        src={backgroundImage}
-        alt="Naples Background"
-        className="absolute inset-0"
-        style={{ 
-          objectFit: 'contain', // Maintain aspect ratio without stretching
-          objectPosition: 'center',
-          height: '100vh', // Use viewport height
-          width: '100vw', // Use viewport width
-          maxWidth: '100%',
-          maxHeight: '100vh',
-          margin: '0 auto', // Center horizontally
-          display: 'block',
-          backgroundColor: '#1E76A6' // Match the image background color
-        }}
-      />
+      {/* Background Image - Using img with margins & rounded corners */}
+      <div className="absolute inset-0 flex items-center justify-center p-6">
+        <div
+          className="rounded-2xl overflow-hidden" 
+          style={{ 
+            width: 'calc(100vw - 48px)', // Full width minus 24px on each side
+            height: 'calc(100vh - 48px)', // Full height minus 24px on top and bottom
+            maxHeight: 'calc(100vh - 48px)',
+            borderRadius: '16px', // 16px rounded corners  
+            backgroundColor: '#1E76A6', // Match the image background color
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' // Subtle shadow
+          }}
+        >
+          <img 
+            src={backgroundImage}
+            alt="Naples Background"
+            style={{ 
+              objectFit: 'contain', // Maintain aspect ratio without stretching
+              objectPosition: 'center',
+              width: '100%', 
+              height: '100%',
+              display: 'block',
+            }}
+          />
+        </div>
+      </div>
       
       {/* Button Container - positioned to align with the grey area */}
       <div 
