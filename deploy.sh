@@ -65,6 +65,11 @@ cp ./client/public/favicon.png ./public/favicon.png
 cp ./client/public/favicon.png ./client/dist/client/favicon.png
 cp ./client/public/favicon.png ./static/favicon.png
 
+# Copy iOS home screen icon to all necessary locations
+cp ./client/public/apple-touch-icon.png ./public/apple-touch-icon.png
+cp ./client/public/apple-touch-icon.png ./client/dist/client/apple-touch-icon.png
+cp ./client/public/apple-touch-icon.png ./static/apple-touch-icon.png
+
 cp ./client/public/preview.png ./public/preview.png
 cp ./client/public/preview.png ./client/dist/client/preview.png
 cp ./client/public/preview.png ./static/preview.png
