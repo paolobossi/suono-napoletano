@@ -28,7 +28,7 @@ export default function About() {
           </p>
           
           <p className="text-base md:text-lg">
-            Il sito ha finalità esclusivamente ludiche e non commerciali.
+            Il sito ha finalità esclusivamente ludiche e non commerciali. Questo è stato un progetto personale divertente per testare nuovi strumenti di intelligenza artificiale (ChatGPT, Replit).
           </p>
         </div>
         
