@@ -20,10 +20,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }));
   
   // Audio endpoint - now using local MP3 file
-  // Special route for ads.txt in the root
+  // Special route for ads.txt in the root - serving the file directly
   app.get("/ads.txt", (req, res) => {
     res.setHeader('Content-Type', 'text/plain');
-    res.send('google.com, pub-1733624280085328, DIRECT, f08c47fec0942fa0');
+    res.sendFile(path.join(process.cwd(), 'ads.txt')); // Serve from root directory
   });
   
   app.get("/api/audio", (req, res) => {
@@ -47,6 +47,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Skip API routes
     if (req.path.startsWith('/api') || req.path.startsWith('/assets')) {
       return next();
+    }
+    
+    // Handle ads.txt at any path level for compatibility with domain.com/ads.txt
+    if (req.path.endsWith('/ads.txt')) {
+      res.setHeader('Content-Type', 'text/plain');
+      return res.sendFile(path.join(process.cwd(), 'ads.txt'));
     }
     
     // If this is a deployment, use special handling
