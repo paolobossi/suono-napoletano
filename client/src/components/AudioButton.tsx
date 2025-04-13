@@ -277,7 +277,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         className={`fixed w-full flex justify-center transition-all duration-500 ease-out pointer-events-none`}
         style={{ 
           zIndex: 10,
-          bottom: showFanImage ? '-60px' : '-100%',  // Position 60px lower from bottom (110px - 50px)
+          bottom: showFanImage ? '0px' : '-100vh',  // Completely off screen when not showing
           opacity: 1,
           width: '100vw',
           left: '50%',
