@@ -5,27 +5,46 @@
 # Make sure we're in the project root directory
 cd "$(dirname "$0")"
 
-# Ensure ads.txt is in the root directory for deployment
-if [ ! -f "./ads.txt" ]; then
-  echo "Error: ads.txt not found in the root directory"
-  exit 1
-fi
+# Create ads.txt content
+ADSENSE_CONTENT="google.com, pub-1733624280085328, DIRECT, f08c47fec0942fa0"
 
-# Make sure it's also copied to other locations for redundancy
-# In public directory
-mkdir -p ./public
-cp ./ads.txt ./public/ads.txt
+# Write ads.txt content to key locations - this ensures the file exists even if it wasn't there before
+echo "$ADSENSE_CONTENT" > ./ads.txt
+echo "$ADSENSE_CONTENT" > ./public/ads.txt 
+echo "$ADSENSE_CONTENT" > ./public/ads.txt.static
 
-# Make sure it's included in the client dist directory
+# Create special html file for ads.txt that redirects
+cat > ./public/ads.html << EOL
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Ads.txt</title>
+    <meta http-equiv="refresh" content="0;url=/ads.txt">
+</head>
+<body>
+    $ADSENSE_CONTENT
+</body>
+</html>
+EOL
+
+# Make sure ads.txt can be found in all possible locations in the dist directory
 mkdir -p ./client/dist/client
-cp ./ads.txt ./client/dist/client/ads.txt
+echo "$ADSENSE_CONTENT" > ./client/dist/client/ads.txt
+cp ./public/ads.html ./client/dist/client/ads.html
+
+# Create a direct file in public_html directory for direct server access 
+mkdir -p ./public_html
+echo "$ADSENSE_CONTENT" > ./public_html/ads.txt
 
 # Display success message
-echo "ads.txt has been copied to all necessary locations for deployment"
+echo "ads.txt has been written to all necessary locations for deployment"
 
-# IMPORTANT: For Replit deployments, make sure to:
-# 1. Set up proper routing in server/routes.ts (already done)
-# 2. Make a direct GET request to the site root:
+# IMPORTANT: For Replit deployments, test ALL of these URLs:
 echo ""
-echo "After deployment, please test with: curl -L https://suononapoletano.com/ads.txt"
-echo "It should return: google.com, pub-1733624280085328, DIRECT, f08c47fec0942fa0"
+echo "After deployment, please test ALL of these URLs:"
+echo "1. curl -L https://suononapoletano.com/ads.txt"
+echo "2. curl -L https://suononapoletano.com/ads.html"
+echo "3. curl -L https://suononapoletano.com/public/ads.txt"
+echo ""
+echo "At least one of these should work. If none do, you need to contact Replit support."
