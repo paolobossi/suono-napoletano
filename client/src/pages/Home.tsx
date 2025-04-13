@@ -110,11 +110,11 @@ export default function Home() {
     flex items-center justify-center pointer-events-none w-full h-full
   `;
   
-  // Define desktop-specific button positioning
+  // Define desktop-specific button positioning with improved centering
   const buttonStyle = {
     position: 'absolute' as const, // Type assertion to fix TypeScript error
-    left: 0,
-    right: 0,
+    left: '50%', // Position from the middle of the screen
+    transform: 'translateX(-50%)', // Center the element itself
     top: 0,
     bottom: 0,
     // Center the button in the middle of the screen
