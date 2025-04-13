@@ -2,8 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Play, Volume2, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-// Import fan image directly for reliable loading in production
+// Import assets directly for reliable loading in production
 import fanImage from "../assets/napoli-fan.png";
+import audioFile from "../assets/TarantellaNapoletana.mp3";
 
 interface AudioButtonProps {
   audioUrl: string | null;
@@ -21,35 +22,39 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
   const touchTimerRef = useRef<number | null>(null);
   const { toast } = useToast();
 
-  // Initialize and preload audio
+  // Initialize and preload audio - using direct import for deployment reliability
   useEffect(() => {
-    if (audioUrl) {
-      // Create new audio element
-      const audio = new Audio();
-      
-      // Set up event listeners for preloading
-      audio.addEventListener("canplaythrough", () => {
-        setIsAudioReady(true);
-        console.log("Audio is ready to play");
+    // Create new audio element using the directly imported audio file
+    // This ensures it works in production deployment
+    const audio = new Audio();
+    
+    // Set up event listeners for preloading
+    audio.addEventListener("canplaythrough", () => {
+      setIsAudioReady(true);
+      console.log("Audio is ready to play");
+    });
+    
+    audio.addEventListener("error", (e) => {
+      console.error("Audio loading error:", e);
+      console.error("Audio error code:", (e.target as HTMLAudioElement).error?.code);
+      console.error("Audio error message:", (e.target as HTMLAudioElement).error?.message);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "There was a problem loading the audio.",
       });
-      
-      audio.addEventListener("error", (e) => {
-        console.error("Audio loading error:", e);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "There was a problem loading the audio.",
-        });
-      });
-      
-      // Start preloading
-      audio.preload = "auto";
-      audio.src = audioUrl;
-      audio.load();
-      
-      // Store reference
-      audioRef.current = audio;
-    }
+    });
+    
+    // Log the source being used
+    console.log("Using audio source from import:", audioFile);
+    
+    // Start preloading - Use imported audio file directly
+    audio.preload = "auto";
+    audio.src = audioFile;
+    audio.load();
+    
+    // Store reference
+    audioRef.current = audio;
 
     return () => {
       if (audioRef.current) {
@@ -58,11 +63,11 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         setIsAudioReady(false);
       }
     };
-  }, [audioUrl, toast]);
+  }, [toast]);
 
   // Function to handle starting audio playback
   const startAudio = () => {
-    if (!audioRef.current || !audioUrl) return;
+    if (!audioRef.current) return;
     
     try {
       // Clear any existing touch timer
@@ -77,6 +82,8 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       // Show the fan image immediately when starting playback
       setShowFanImage(true);
       
+      console.log("Attempting to play audio from import source:", audioFile);
+      
       // Play with better error handling
       const playPromise = audioRef.current.play();
       
@@ -85,6 +92,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         playPromise
           .then(() => {
             // Playback started successfully
+            console.log("Audio playback started successfully");
             setIsPlaying(true);
           })
           .catch(err => {
@@ -111,6 +119,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
           });
       } else {
         // Older browsers or successful play with no promise
+        console.log("Audio playback initiated (older browser)");
         setIsPlaying(true);
       }
     } catch (err) {
@@ -201,7 +210,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
     }
     
     // Show different loading state when audio is not yet ready
-    if (!isAudioReady && audioUrl) {
+    if (!isAudioReady) {
       return (
         <div className="flex items-center justify-center">
           <div className="relative">
@@ -277,7 +286,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
-        disabled={isLoading || !!error || !audioUrl}
+        disabled={isLoading || !!error}
         aria-label="Press and hold to play audio"
         style={{
           boxShadow: isPlaying ? '0 0 20px rgba(4, 160, 224, 0.7)' : '0 0 15px rgba(4, 160, 224, 0.4)',
