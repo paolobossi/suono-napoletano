@@ -37,7 +37,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
     
     // Log desktop detection for debugging
     if (initialDesktopState) {
-      console.log('%c 💻 Desktop mode active - larger fan image applied', 'background: #22c55e; color: white; padding: 4px; border-radius: 4px;');
+      console.log('%c 💻 Desktop mode active - fan image 2x size', 'background: #22c55e; color: white; padding: 4px; border-radius: 4px;');
     }
     
     // Update on window resize
@@ -47,9 +47,9 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       // Only log if there was a change in state
       if (newDesktopState !== isDesktop) {
         if (newDesktopState) {
-          console.log('%c 💻 Desktop mode activated - larger fan image applied', 'background: #22c55e; color: white; padding: 4px; border-radius: 4px;');
+          console.log('%c 💻 Desktop mode activated - fan image 2x size', 'background: #22c55e; color: white; padding: 4px; border-radius: 4px;');
         } else {
-          console.log('%c 📱 Mobile mode activated - standard fan image size', 'background: #0ea5e9; color: white; padding: 4px; border-radius: 4px;');
+          console.log('%c 📱 Mobile mode activated - fan image 1.2x size', 'background: #0ea5e9; color: white; padding: 4px; border-radius: 4px;');
         }
       }
       
@@ -328,7 +328,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         <>
           {isDesktop && (
             <div className="fixed top-0 right-0 bg-green-500 text-white text-xs p-1 z-50">
-              Desktop mode active (fan 1.44x)
+              Desktop mode active (fan 2.0x)
             </div>
           )}
         </>
@@ -357,11 +357,11 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
             // Scale logic: 
             // - iPhone SE: no scaling
             // - Regular mobile: 1.2x scaling (20% larger)
-            // - Desktop: 1.44x scaling (20% larger than mobile, which is 1.2 * 1.2 = 1.44)
+            // - Desktop: 2.0x scaling (100% larger/twice the base size)
             transform: isIPhoneSE 
               ? 'none' 
               : isDesktop 
-                ? 'scale(1.44)' // 20% larger than mobile (1.2 * 1.2)
+                ? 'scale(2.0)' // Much larger on desktop (twice the base size)
                 : 'scale(1.2)', // 20% larger than base size
           }}
         />
