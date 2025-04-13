@@ -110,50 +110,67 @@ export default function Home() {
     ${isIPhoneSE ? 'iphone-se-position' : ''}
   `;
 
+  // Determine if we're on desktop based on screen width
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
+
+  // Update isDesktop state when window is resized
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth > 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <div className="full-viewport w-full overflow-hidden relative">
-      {/* iPhone SE detection status indicator (for debugging) */}
-      {process.env.NODE_ENV === 'development' && isIPhoneSE && (
-        <div className="fixed top-0 left-0 bg-blue-500 text-white text-xs p-1 z-50">
-          iPhone SE mode active
-        </div>
-      )}
-      
-      {/* Background Image - Using an img tag for better control */}
-      <img 
-        src={backgroundImage}
-        alt="Naples Background"
-        className="absolute inset-0"
-        style={{ 
-          objectFit: 'contain', // Maintain aspect ratio without stretching
-          objectPosition: 'center',
-          height: '100vh', // Use viewport height
-          width: '100vw', // Use viewport width
-          maxWidth: '100%',
-          maxHeight: '100vh',
-          margin: '0 auto', // Center horizontally
-          display: 'block',
-          backgroundColor: '#1E76A6' // Match the image background color
-        }}
-      />
-      
-      {/* Button Container - positioned to align with the grey area */}
+    <div className="min-h-screen w-full overflow-hidden relative flex justify-center">
+      {/* Mobile-first container with desktop max-width */}
       <div 
-        className={buttonContainerClasses}
+        className="relative h-full flex flex-col items-center justify-center" 
         style={{ 
-          position: 'absolute',
-          top: isIPhoneSE ? '65%' : '75%', // Lower for iPhone SE, 75% for other devices
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 'auto'
+          maxWidth: isDesktop ? '402px' : '100%', // Only limit width on desktop
+          width: '100%',
+          height: '100vh',
+          backgroundColor: '#1E76A6' // Match background color
         }}
       >
-        <AudioButton 
-          audioUrl={audioUrlToUse} 
-          isLoading={isLoading} 
-          error={error}
-          isIPhoneSE={isIPhoneSE}
-        />
+        {/* iPhone SE detection status indicator (for debugging) */}
+        {process.env.NODE_ENV === 'development' && isIPhoneSE && (
+          <div className="fixed top-0 left-0 bg-blue-500 text-white text-xs p-1 z-50">
+            iPhone SE mode active
+          </div>
+        )}
+        
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0"
+          style={{ 
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: 'contain',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            height: '100%',
+            width: '100%'
+          }}
+        ></div>
+        
+        {/* Button Container - positioned to align with the grey area */}
+        <div 
+          className={buttonContainerClasses}
+          style={{ 
+            marginTop: '45%', // Default positioning for non-iPhone SE
+            position: 'relative',
+            zIndex: 10
+          }}
+        >
+          <AudioButton 
+            audioUrl={audioUrlToUse} 
+            isLoading={isLoading} 
+            error={error}
+            isIPhoneSE={isIPhoneSE}
+          />
+        </div>
       </div>
     </div>
   );
