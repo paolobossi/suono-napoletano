@@ -25,10 +25,6 @@ export default function About() {
             in una versione interpretata da <em>Mario Rusca</em> e l'<em>Orchestra Mandolinistica Italiana</em>, 
             tratta dall'album <em>"Lounges and Restaurants"</em>, pubblicato da 
             Sonoton Music il 30 giugno 2000.
-            <br className="my-2" />
-            Arrangiamento: Mario Rusca — Compositore: Tradizionale
-            <br className="my-1" />
-            Editore musicale: Sonoton Music GmbH & Co. KG
           </p>
           
           <p className="text-base md:text-lg">
