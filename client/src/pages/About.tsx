@@ -2,8 +2,8 @@ import { Link } from "wouter";
 
 export default function About() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full p-6 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-start justify-center p-4 py-8 overflow-auto">
+      <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full p-6 md:p-8 my-4">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Informazioni</h1>
         
         <div className="space-y-6 text-gray-700">
