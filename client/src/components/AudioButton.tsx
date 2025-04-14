@@ -35,7 +35,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
     
     // Log desktop detection for debugging
     if (initialDesktopState) {
-      console.log('%c 💻 Desktop mode active - fan image 320px width', 'background: #22c55e; color: white; padding: 4px; border-radius: 4px;');
+      console.log('%c 💻 Desktop mode active - fan image 280px width', 'background: #22c55e; color: white; padding: 4px; border-radius: 4px;');
     }
     
     // Update on window resize
@@ -45,7 +45,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       // Only log if there was a change in state
       if (newDesktopState !== isDesktop) {
         if (newDesktopState) {
-          console.log('%c 💻 Desktop mode activated - fan image 320px width', 'background: #22c55e; color: white; padding: 4px; border-radius: 4px;');
+          console.log('%c 💻 Desktop mode activated - fan image 280px width', 'background: #22c55e; color: white; padding: 4px; border-radius: 4px;');
         } else {
           console.log('%c 📱 Mobile mode activated - fan image ' + (isIPhoneSE ? '208px' : '256px') + ' width', 'background: #0ea5e9; color: white; padding: 4px; border-radius: 4px;');
         }
@@ -312,7 +312,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         <>
           {isDesktop && (
             <div className="fixed top-0 right-0 bg-green-500 text-white text-xs p-1 z-50">
-              Desktop mode active (fan 320px width)
+              Desktop mode active (fan 280px width)
             </div>
           )}
         </>
@@ -338,11 +338,11 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
           style={{
             filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))',
             display: 'block',
-            // Desktop: fixed 320px width
+            // Desktop: fixed 280px width
             // iPhone SE: smaller size (w-52 = 13rem = 208px)
             // Regular mobile: medium size (w-64 = 16rem = 256px)
             width: isDesktop 
-              ? '320px' 
+              ? '280px' 
               : isIPhoneSE 
                 ? '208px' // 13rem (w-52)
                 : '256px', // 16rem (w-64)
