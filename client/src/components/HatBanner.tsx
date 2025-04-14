@@ -53,8 +53,8 @@ export function HatBanner({ className }: HatBannerProps) {
           
           {/* Text content */}
           <div className="ml-3">
-            <h3 className="text-base font-bold text-gray-900">Cappello Napoletano</h3>
-            <p className="text-sm text-gray-600">Compra il cappello</p>
+            <h3 className="text-base font-bold text-gray-900">Compra il cappello</h3>
+            <p className="text-sm text-gray-600">L'originale di Napoli, simbolo della città</p>
           </div>
         </div>
       </div>
