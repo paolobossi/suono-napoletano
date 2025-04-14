@@ -29,9 +29,30 @@ interface HatBannerProps {
 }
 
 export function HatBanner({ className }: HatBannerProps) {
+  // Check if desktop based on window width
+  const [isDesktop, setIsDesktop] = React.useState(false);
+  
+  React.useEffect(() => {
+    const checkScreenSize = () => {
+      setIsDesktop(window.innerWidth > 768);
+    };
+    
+    // Check on mount
+    checkScreenSize();
+    
+    // Add event listener for resize
+    window.addEventListener('resize', checkScreenSize);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+  
   return (
-    <div className={`${className || ''} fixed top-0 left-0 right-0 z-50`} style={{ padding: '16px 16px 0 16px' }}>
-      <div className="bg-white w-full rounded shadow-md">
+    <div className={`${className || ''} fixed top-0 left-0 right-0 z-50 flex justify-center`} style={{ padding: '16px 16px 0 16px' }}>
+      <div className="bg-white rounded shadow-md" style={{ 
+        width: '100%',
+        maxWidth: isDesktop ? '400px' : '100%'
+      }}>
         <div className="flex items-center p-3">
           {/* Square hat image */}
           <div className="w-14 h-14 bg-gray-100 rounded overflow-hidden flex-shrink-0">
