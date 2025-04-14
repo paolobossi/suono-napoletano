@@ -53,7 +53,7 @@ export function HatBanner({ className }: HatBannerProps) {
           
           {/* Text content */}
           <div className="ml-2">
-            <h3 className="text-sm font-bold text-gray-900">Compra il cappello</h3>
+            <h3 className="text-sm font-bold text-gray-900">Compra il cappello ›</h3>
             <p className="text-xs text-gray-600">Un simbolo d'orgoglio, passione e identità.</p>
           </div>
         </div>
