@@ -30,14 +30,19 @@ interface HatBannerProps {
 
 export function HatBanner({ className }: HatBannerProps) {
   return (
-    <div className={`${className} fixed top-0 left-0 right-0 bg-white py-2 px-4 z-50 shadow-md`}>
-      <div className="flex items-center">
-        <div className="w-12 h-12 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
-          <HatSvg />
-        </div>
-        <div className="ml-3">
-          <h3 className="text-sm font-medium text-gray-900">Cappello Napoletano</h3>
-          <p className="text-xs text-gray-500">Compra il cappello ufficiale della città!</p>
+    <div className={`${className || ''} fixed top-0 left-0 right-0 z-50`} style={{ padding: '16px 16px 0 16px' }}>
+      <div className="bg-white w-full rounded shadow-md">
+        <div className="flex items-center p-3">
+          {/* Square hat image */}
+          <div className="w-14 h-14 bg-gray-100 rounded overflow-hidden flex-shrink-0">
+            <HatSvg />
+          </div>
+          
+          {/* Text content */}
+          <div className="ml-3">
+            <h3 className="text-base font-bold text-gray-900">Cappello Napoletano</h3>
+            <p className="text-sm text-gray-600">Compra il cappello</p>
+          </div>
         </div>
       </div>
     </div>
