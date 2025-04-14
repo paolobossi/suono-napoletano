@@ -2,6 +2,7 @@ import { useState, useEffect, useLayoutEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { AudioButton } from "@/components/AudioButton";
+import { HatBanner } from "@/components/HatBanner";
 // Import assets directly for reliable loading in production
 import backgroundImage from "../assets/naples-background-new.png";
 import audioMp3 from "../assets/TarantellaNapoletana.mp3";
@@ -153,6 +154,9 @@ export default function Home() {
 
   return (
     <div className="full-viewport w-full overflow-hidden relative">
+      {/* Hat Banner - positioned at the top */}
+      <HatBanner />
+      
       {/* Question mark button - positioned in bottom left corner */}
       <Link 
         href="/about" 
