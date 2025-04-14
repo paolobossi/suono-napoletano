@@ -28,7 +28,7 @@ export function HatBanner({ className }: HatBannerProps) {
   }, []);
   
   // Calculate banner width: 32px less than window width on desktop
-  const bannerWidth = isDesktop ? Math.min(windowWidth - 32, 400) : '100%';
+  const bannerWidth = isDesktop ? Math.min(windowWidth - 32, 520) : '100%';
   
   return (
     <div 
