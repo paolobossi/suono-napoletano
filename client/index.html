@@ -1,119 +1,108 @@
 <!DOCTYPE html>
 <html lang="en" style="height: 100%; overflow: hidden;">
-   <head>
-     <meta charset="UTF-8" />
-     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-     <meta name="mobile-web-app-capable" content="yes">
-     <meta name="theme-color" content="#1E76A6">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1E76A6">
 
-     <!-- Open Graph Meta for WhatsApp & Social -->
-     <meta property="og:title" content="Suono Napoletano" />
-     <meta property="og:description" content="In quale città?" />
-     <meta property="og:image" content="https://suononapoletano.com/preview-v2.png" />
-     <meta property="og:image:type" content="image/png" />
-     <meta property="og:image:width" content="1200" />
-     <meta property="og:image:height" content="630" />
-     <meta property="og:image:alt" content="Napoli skyline with Mount Vesuvius and 'IN QUALE CITTÀ?' text" />
-     <meta property="og:type" content="website" />
-     <meta property="og:url" content="https://suononapoletano.com" />
-     
-     <!-- Alternate image URLs for different services -->
-     <link rel="image_src" href="https://suononapoletano.com/preview-v2.png" />
-     <meta itemprop="image" content="https://suononapoletano.com/preview-v2.png" />
-     
-     <!-- Facebook specific -->
-     <meta property="og:locale" content="it_IT" />
-     <meta property="og:site_name" content="Suono Napoletano" />
-     
-     <!-- Twitter Card Tags (for Twitter sharing) -->
-     <meta name="twitter:card" content="summary_large_image" />
-     <meta name="twitter:title" content="Suono Napoletano" />
-     <meta name="twitter:description" content="In quale città?" />
-     <meta name="twitter:image" content="https://suononapoletano.com/preview-v2.png" />
-     
-     <!-- WhatsApp specific - using additional Open Graph tags that WhatsApp recognizes -->
-     <meta property="og:image:secure_url" content="https://suononapoletano.com/preview-v2.png" />
-     <meta property="og:image:url" content="https://suononapoletano.com/preview-v2.png" />
-     
-     <!-- These non-standard tags might be used by some services -->
-     <meta name="whatsapp:title" content="Suono Napoletano" />
-     <meta name="whatsapp:description" content="In quale città?" />
-     <meta name="whatsapp:image" content="https://suononapoletano.com/preview-v2.png" />
-     
-     <base href="./">
-     <title>Suono Napoletano</title>
-     <!-- Favicon and iOS home screen icons -->
-     <link rel="icon" type="image/png" href="/favicon.png">
-     <link rel="shortcut icon" type="image/png" href="/favicon.png">
-     
-     <!-- iOS home screen icon -->
-     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-     <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png">
-     
-     <!-- iOS specific settings -->
-     <meta name="apple-mobile-web-app-capable" content="yes">
-     <meta name="apple-mobile-web-app-title" content="Suono Napoletano">
-     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-     <!-- AdSense verification -->
-     <link rel="canonical" href="https://suononapoletano.com/" />
-     <link rel="prefetch" href="/ads.txt" />
-     <!-- Note: ads.txt is available at the root: https://suononapoletano.com/ads.txt -->
-     
-     <!-- Inline ads.txt content for search engines -->
-     <script type="application/ld+json">
-     {
-       "@context": "https://schema.org",
-       "@type": "WebSite",
-       "name": "Suono Napoletano",
-       "url": "https://suononapoletano.com/",
-       "potentialAction": {
-         "@type": "ViewAction",
-         "target": "https://suononapoletano.com/ads.txt"
-       },
-       "description": "ads.txt content: google.com, pub-1733624280085328, DIRECT, f08c47fec0942fa0"
-     }
-     </script>
-     <style>
-       html, body {
-         height: 100% !important;
-         width: 100% !important;
-         margin: 0;
-         padding: 0;
-         overflow: hidden;
-       }
-       #root {
-         height: 100%;
-         width: 100%;
-         display: flex;
-         flex-direction: column;
-       }
-     </style>
-   </head>
+    <!-- Open Graph Meta for WhatsApp & Social -->
+    <meta property="og:title" content="Suono Napoletano" />
+    <meta property="og:description" content="In quale città?" />
+    <meta property="og:image" content="https://res.cloudinary.com/djqygjwnv/image/upload/v1744646553/Preview-v2_ya9nd1.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Napoli skyline with Mount Vesuvius and 'IN QUALE CITTÀ?' text" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://suononapoletano.com" />
+    
+    <!-- Alternate image URLs for different services -->
+    <link rel="image_src" href="https://res.cloudinary.com/djqygjwnv/image/upload/v1744646553/Preview-v2_ya9nd1.png" />
+    <meta itemprop="image" content="https://res.cloudinary.com/djqygjwnv/image/upload/v1744646553/Preview-v2_ya9nd1.png" />
+    
+    <!-- Facebook specific -->
+    <meta property="og:locale" content="it_IT" />
+    <meta property="og:site_name" content="Suono Napoletano" />
+    
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Suono Napoletano" />
+    <meta name="twitter:description" content="In quale città?" />
+    <meta name="twitter:image" content="https://res.cloudinary.com/djqygjwnv/image/upload/v1744646553/Preview-v2_ya9nd1.png" />
+    
+    <!-- Extra OG compatibility -->
+    <meta property="og:image:secure_url" content="https://res.cloudinary.com/djqygjwnv/image/upload/v1744646553/Preview-v2_ya9nd1.png" />
+    <meta property="og:image:url" content="https://res.cloudinary.com/djqygjwnv/image/upload/v1744646553/Preview-v2_ya9nd1.png" />
+
+    <base href="./">
+    <title>Suono Napoletano</title>
+    
+    <!-- Favicon and iOS home screen icons -->
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="shortcut icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png">
+    
+    <!-- iOS specific settings -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Suono Napoletano">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- AdSense verification -->
+    <link rel="canonical" href="https://suononapoletano.com/" />
+    <link rel="prefetch" href="/ads.txt" />
+    
+    <!-- Inline ads.txt content for search engines -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Suono Napoletano",
+      "url": "https://suononapoletano.com/",
+      "potentialAction": {
+        "@type": "ViewAction",
+        "target": "https://suononapoletano.com/ads.txt"
+      },
+      "description": "ads.txt content: google.com, pub-1733624280085328, DIRECT, f08c47fec0942fa0"
+    }
+    </script>
+
+    <style>
+      html, body {
+        height: 100% !important;
+        width: 100% !important;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      #root {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+    </style>
+  </head>
   <body style="height: 100%; margin: 0; overflow: hidden;">
-
     
     <!-- Google AdSense banner-top -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1733624280085328"
-       crossorigin="anonymous"></script>
+      crossorigin="anonymous"></script>
     <ins class="adsbygoogle"
-       style="display:block"
-       data-ad-client="ca-pub-1733624280085328"
-       data-ad-slot="9853095823"
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
+      style="display:block"
+      data-ad-client="ca-pub-1733624280085328"
+      data-ad-slot="9853095823"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
     <script>
-       (adsbygoogle = window.adsbygoogle || []).push({});
+      (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
 
-    <!-- Your app content below -->
-
-    
     <div id="root"></div>
-    <!-- Special script to handle ads.txt requests via client-side detection -->
-    <script type="text/javascript" src="/redirect-to-ads.js"></script>
     
+    <script type="text/javascript" src="/redirect-to-ads.js"></script>
     <script type="module" src="/src/main.tsx"></script>
-    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
     <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
   </body>
 </html>
