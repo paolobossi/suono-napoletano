@@ -30,6 +30,15 @@ export default function About() {
           <p className="text-base md:text-lg">
             Il sito ha finalità esclusivamente ludiche e non commerciali. Questo è stato un progetto personale divertente per testare nuovi strumenti di intelligenza artificiale (ChatGPT, Replit).
           </p>
+          
+          <p className="text-base md:text-lg">
+            Per informazioni, scrivere a <a 
+              href="mailto:info@suononapoletano.com" 
+              className="font-semibold text-[#04a0e0] hover:underline"
+            >
+              info@suononapoletano.com
+            </a>
+          </p>
         </div>
         
         <div className="mt-8 text-center">
