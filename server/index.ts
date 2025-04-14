@@ -2,13 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
-import { adsMiddleware } from "./ads-handler";
-
 const app = express();
-
-// HIGHEST PRIORITY: Use the specialized ads.txt middleware before anything else
-// This ensures ads.txt is always served regardless of other routes
-app.use(adsMiddleware);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
