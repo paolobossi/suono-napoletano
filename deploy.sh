@@ -70,17 +70,25 @@ cp ./client/public/apple-touch-icon.png ./public/apple-touch-icon.png
 cp ./client/public/apple-touch-icon.png ./client/dist/client/apple-touch-icon.png
 cp ./client/public/apple-touch-icon.png ./static/apple-touch-icon.png
 
-cp ./client/public/preview.png ./public/preview.png
-cp ./client/public/preview.png ./client/dist/client/preview.png
-cp ./client/public/preview.png ./static/preview.png
+cp ./client/public/preview-v2.png ./public/preview-v2.png
+cp ./client/public/preview-v2.png ./client/dist/client/preview-v2.png
+cp ./client/public/preview-v2.png ./static/preview-v2.png
 
-# Create assets directory and copy preview.png there for backward compatibility
+# For backward compatibility, also maintain preview.png
+cp ./client/public/preview-v2.png ./public/preview.png
+cp ./client/public/preview-v2.png ./client/dist/client/preview.png
+cp ./client/public/preview-v2.png ./static/preview.png
+
+# Create assets directory and copy preview files there for backward compatibility
 mkdir -p ./public/assets
 mkdir -p ./client/dist/client/assets
 mkdir -p ./static/assets
-cp ./client/public/preview.png ./public/assets/preview.png
-cp ./client/public/preview.png ./client/dist/client/assets/preview.png
-cp ./client/public/preview.png ./static/assets/preview.png
+cp ./client/public/preview-v2.png ./public/assets/preview-v2.png
+cp ./client/public/preview-v2.png ./client/dist/client/assets/preview-v2.png
+cp ./client/public/preview-v2.png ./static/assets/preview-v2.png
+cp ./client/public/preview-v2.png ./public/assets/preview.png
+cp ./client/public/preview-v2.png ./client/dist/client/assets/preview.png
+cp ./client/public/preview-v2.png ./static/assets/preview.png
 echo "Copied favicon and preview.png to all necessary locations"
 
 # Client-side JavaScript approach - create a redirect handler
