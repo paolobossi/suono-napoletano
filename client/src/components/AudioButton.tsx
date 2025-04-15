@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Play, Volume2, AlertCircle } from "lucide-react";
 // Import assets directly for reliable loading in production
@@ -193,30 +193,51 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
     }
   };
 
-  // Function to handle stopping audio playback
+  // Function to handle stopping audio playback - soluzione drastica
   const stopAudio = () => {
-    if (!audioRef.current) return;
-    
     try {
+      console.log("Stopping audio - HARD RESET method");
+      
       // Ensure any touch timer is cleared
       if (touchTimerRef.current !== null) {
         window.clearTimeout(touchTimerRef.current);
         touchTimerRef.current = null;
       }
       
-      // Prima aggiorna l'interfaccia così è più reattiva
+      // 1. Prima aggiorna l'interfaccia così è più reattiva
       setIsPlaying(false);
       setShowFanImage(false);
       
-      // Poi ferma l'audio vero e proprio
-      audioRef.current.pause();
-      
-      console.log("Audio playback stopped");
+      // 2. Poi ferma effettivamente l'audio se esiste
+      if (audioRef.current) {
+        // Ferma l'audio in tutti i modi possibili
+        audioRef.current.pause();
+        
+        // Riporta la posizione all'inizio
+        audioRef.current.currentTime = 0;
+        
+        // Per una fermata più drastica, abbassa anche il volume a 0
+        audioRef.current.volume = 0;
+        
+        console.log("Audio playback stopped - complete reset");
+      }
     } catch (err) {
       console.error("Error stopping audio:", err);
+      
       // Assicurati che l'interfaccia sia aggiornata anche in caso di errore
       setIsPlaying(false);
       setShowFanImage(false);
+      
+      // Tentativo di arresto più drastico in caso di errore
+      try {
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+          audioRef.current.volume = 0;
+        }
+      } catch (e) {
+        console.error("Critical error stopping audio:", e);
+      }
     }
   };
   
@@ -250,53 +271,172 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
   };
   
   const handleTouchEnd = (e: React.TouchEvent) => {
-    // Forza lo stato a false immediatamente in modo visivo
+    // Prevenzione immediata della propagazione
+    e.stopPropagation();
+    e.preventDefault();
+    
+    // Aggiorna immediatamente l'UI per feedback istantaneo
     setIsPlaying(false);
     setShowFanImage(false);
     
-    // Aggiunge un log per debug
-    console.log('Touch end - forcefully updating UI before stopping audio');
+    console.log('Touch end - RESET IMMEDIATO UI');
     
-    // Use a small delay before stopping the actual audio to ensure it's properly registered
-    // This helps overcome issues where touch events don't properly register release
+    // 1. Prima chiamata immediata per fermare l'audio
+    if (audioRef.current) {
+      try {
+        audioRef.current.pause();
+        audioRef.current.volume = 0; // Azzera il volume immediatamente
+      } catch (err) {
+        console.error("Immediate pause failed:", err);
+      }
+    }
+    
+    // 2. Poi chiamata a stopAudio che fa un reset completo
+    stopAudio();
+    
+    // 3. Terzo tentativo di fermata con un delay, come ulteriore sicurezza
     touchTimerRef.current = window.setTimeout(() => {
-      // Ferma l'audio con un po' di ritardo ma l'UI è già aggiornata
-      stopAudio();
-      // Forza nuovamente lo stato a false per sicurezza
-      setIsPlaying(false);
-      touchTimerRef.current = null;
-      console.log('Touch end - audio fully stopped after delay');
-    }, 50); // Slightly longer delay to ensure it registers
+      try {
+        // Un ulteriore tentativo di fermare l'audio
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+          audioRef.current.volume = 1; // Ripristina il volume per la prossima riproduzione
+        }
+        
+        // Forza nuovamente lo stato a false per sicurezza
+        setIsPlaying(false);
+        console.log('Touch end - FINAL BACKUP STOP executed');
+      } catch (err) {
+        console.error("Delayed stop also failed:", err);
+      } finally {
+        touchTimerRef.current = null;
+      }
+    }, 100);
   };
   
   // Handle touch cancel events (e.g., when notifications appear or scroll happens)
   const handleTouchCancel = (e: React.TouchEvent) => {
-    // Forza lo stato a false immediatamente
+    // Prevenzione immediata della propagazione
+    e.stopPropagation();
+    
+    // Aggiorna l'UI immediatamente
     setIsPlaying(false);
     setShowFanImage(false);
     
-    console.log('Touch cancel - forcefully updating UI');
+    console.log('Touch cancel - EMERGENCY STOP triggered');
     
-    // Ensure audio stops if the touch interaction is interrupted
+    // Cancella qualsiasi timer pendente
     if (touchTimerRef.current !== null) {
       window.clearTimeout(touchTimerRef.current);
       touchTimerRef.current = null;
     }
     
+    // 1. Primo tentativo immediato di arresto
+    if (audioRef.current) {
+      try {
+        audioRef.current.pause();
+        audioRef.current.volume = 0;
+      } catch (err) {
+        console.error("Immediate pause on cancel failed:", err);
+      }
+    }
+    
+    // 2. Arresto completo tramite stopAudio
     stopAudio();
     
-    // Forza nuovamente lo stato a false per sicurezza
+    // 3. Backup finale con piccolo delay
+    touchTimerRef.current = window.setTimeout(() => {
+      try {
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+          audioRef.current.volume = 1;
+        }
+        setIsPlaying(false);
+        console.log('Touch cancel - FINAL BACKUP STOP executed');
+      } catch (e) {
+        console.error("Final backup stop failed:", e);
+      } finally {
+        touchTimerRef.current = null;
+      }
+    }, 200);
+    
+    // Forza nuovamente lo stato a false per sicurezza assoluta
     setIsPlaying(false);
   };
   
-  // Clean up any timers when component unmounts
+  // Metodo di emergenza per fermare immediatamente la riproduzione audio
+  const emergencyStop = useCallback(() => {
+    console.log("🚨 EMERGENCY AUDIO STOP TRIGGERED 🚨");
+    
+    try {
+      // 1. Prima aggiorna l'interfaccia
+      setIsPlaying(false);
+      setShowFanImage(false);
+      
+      // 2. Cancella eventuali timer
+      if (touchTimerRef.current) {
+        window.clearTimeout(touchTimerRef.current);
+        touchTimerRef.current = null;
+      }
+      
+      // 3. Ferma l'audio in tutti i modi possibili
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        audioRef.current.volume = 0;
+        
+        // Ripristina il volume dopo un breve delay
+        setTimeout(() => {
+          if (audioRef.current) {
+            audioRef.current.volume = 1;
+          }
+        }, 500);
+      }
+    } catch (err) {
+      console.error("Even emergency stop failed:", err);
+    }
+  }, []);
+  
+  // Cleanup, safety net e monitoraggio dello stato della pagina
   useEffect(() => {
+    // Verifica all'avvio che l'audio sia effettivamente fermato
+    emergencyStop();
+    
+    // Ascolta per eventi di visibilitychange del documento (quando l'utente cambia tab o minimizza)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        // Se l'utente cambia tab o minimizza, ferma la riproduzione
+        emergencyStop();
+      }
+    };
+    
+    // Aggiungi event listener
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Ascolta per gli eventi di beforeunload (quando l'utente chiude la pagina)
+    const handleBeforeUnload = () => {
+      emergencyStop();
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
     return () => {
+      // Rimuovi gli event listener
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      
+      // Cancella eventuali timer pendenti
       if (touchTimerRef.current !== null) {
         window.clearTimeout(touchTimerRef.current);
       }
+      
+      // Cleanup e ferma qualsiasi riproduzione audio quando il componente viene smontato
+      emergencyStop();
+      console.log("Cleaned up audio and event listeners on unmount");
     };
-  }, []);
+  }, [emergencyStop]);
 
   const getButtonContent = () => {
     if (isLoading) {
