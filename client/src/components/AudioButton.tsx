@@ -146,11 +146,12 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         touchTimerRef.current = null;
       }
       
+      // Prima aggiorna l'interfaccia per feedback immediato all'utente
+      setIsPlaying(true);
+      setShowFanImage(true);
+      
       // Reset playback position
       audioRef.current.currentTime = 0;
-      
-      // Show the fan image immediately when starting playback
-      setShowFanImage(true);
       
       console.log("Attempting to play audio from import source:", audioFile);
       
@@ -163,12 +164,13 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
           .then(() => {
             // Playback started successfully
             console.log("Audio playback started successfully");
-            setIsPlaying(true);
+            // Stato visivo già aggiornato per reattività dell'interfaccia
           })
           .catch(err => {
             console.error("Failed to play audio:", err);
             
-            // Hide fan image on error
+            // Reset UI on error
+            setIsPlaying(false);
             setShowFanImage(false);
             
             // Just log the error, no toast notification
@@ -181,10 +183,11 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       } else {
         // Older browsers or successful play with no promise
         console.log("Audio playback initiated (older browser)");
-        setIsPlaying(true);
+        // Stato visivo già aggiornato per reattività dell'interfaccia
       }
     } catch (err) {
       console.error("Error playing audio:", err);
+      // Reset UI on error
       setIsPlaying(false);
       setShowFanImage(false);
     }
@@ -201,13 +204,19 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         touchTimerRef.current = null;
       }
       
-      audioRef.current.pause();
+      // Prima aggiorna l'interfaccia così è più reattiva
       setIsPlaying(false);
-      
-      // Hide the fan image when stopping the audio
       setShowFanImage(false);
+      
+      // Poi ferma l'audio vero e proprio
+      audioRef.current.pause();
+      
+      console.log("Audio playback stopped");
     } catch (err) {
       console.error("Error stopping audio:", err);
+      // Assicurati che l'interfaccia sia aggiornata anche in caso di errore
+      setIsPlaying(false);
+      setShowFanImage(false);
     }
   };
   
@@ -222,26 +231,49 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       touchTimerRef.current = null;
     }
     
+    // Forza lo stato visibile a true prima di iniziare a riprodurre
+    console.log('Touch start - forcefully updating isPlaying state');
     startAudio();
   };
   
   const handleTouchEnd = (e: React.TouchEvent) => {
-    // Use a small delay before stopping to ensure it's properly registered
+    // Forza lo stato a false immediatamente in modo visivo
+    setIsPlaying(false);
+    setShowFanImage(false);
+    
+    // Aggiunge un log per debug
+    console.log('Touch end - forcefully updating UI before stopping audio');
+    
+    // Use a small delay before stopping the actual audio to ensure it's properly registered
     // This helps overcome issues where touch events don't properly register release
     touchTimerRef.current = window.setTimeout(() => {
+      // Ferma l'audio con un po' di ritardo ma l'UI è già aggiornata
       stopAudio();
+      // Forza nuovamente lo stato a false per sicurezza
+      setIsPlaying(false);
       touchTimerRef.current = null;
+      console.log('Touch end - audio fully stopped after delay');
     }, 50); // Slightly longer delay to ensure it registers
   };
   
   // Handle touch cancel events (e.g., when notifications appear or scroll happens)
   const handleTouchCancel = (e: React.TouchEvent) => {
+    // Forza lo stato a false immediatamente
+    setIsPlaying(false);
+    setShowFanImage(false);
+    
+    console.log('Touch cancel - forcefully updating UI');
+    
     // Ensure audio stops if the touch interaction is interrupted
     if (touchTimerRef.current !== null) {
       window.clearTimeout(touchTimerRef.current);
       touchTimerRef.current = null;
     }
+    
     stopAudio();
+    
+    // Forza nuovamente lo stato a false per sicurezza
+    setIsPlaying(false);
   };
   
   // Clean up any timers when component unmounts
