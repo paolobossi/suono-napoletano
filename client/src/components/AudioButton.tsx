@@ -220,10 +220,14 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
     }
   };
   
-  // Improved touch handling for mobile devices
+  // Improved touch handling for mobile devices - massima reattività
   const handleTouchStart = (e: React.TouchEvent) => {
-    // Don't call preventDefault() as it can interfere with some mobile browsers
-    // Instead, use passive touch events for better performance
+    // Previene qualsiasi propagazione che possa rallentare l'evento
+    e.stopPropagation();
+    
+    // Aggiorna l'interfaccia IMMEDIATAMENTE per massima reattività
+    setIsPlaying(true);
+    setShowFanImage(true);
     
     // Ensure any lingering touch events are cleared
     if (touchTimerRef.current !== null) {
@@ -231,9 +235,18 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       touchTimerRef.current = null;
     }
     
-    // Forza lo stato visibile a true prima di iniziare a riprodurre
-    console.log('Touch start - forcefully updating isPlaying state');
-    startAudio();
+    // Ottimizzazione: imposta subito il currentTime a 0 se l'audio element esiste
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+    }
+    
+    // Log per debug
+    console.log('Touch start - IMMEDIATO aggiornamento UI');
+    
+    // Avvia l'audio con un timeout leggerissimo per dare priorità all'aggiornamento UI
+    requestAnimationFrame(() => {
+      startAudio();
+    });
   };
   
   const handleTouchEnd = (e: React.TouchEvent) => {
@@ -390,7 +403,24 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         } ${
           error ? "bg-red-600 hover:bg-red-700" : "bg-[#04a0e0] hover:bg-[#038ecf]"
         }`}
-        onMouseDown={startAudio}
+        onMouseDown={(e) => {
+          // Previeni qualsiasi propagazione per massima reattività
+          e.stopPropagation();
+          
+          // Aggiorna l'interfaccia IMMEDIATAMENTE
+          setIsPlaying(true);
+          setShowFanImage(true);
+          
+          // Ottimizzazione: imposta subito il currentTime a 0 se l'audio element esiste
+          if (audioRef.current) {
+            audioRef.current.currentTime = 0;
+          }
+          
+          // Avvia l'audio con un frame delay per dare priorità all'aggiornamento UI
+          requestAnimationFrame(() => {
+            startAudio();
+          });
+        }}
         onMouseUp={stopAudio}
         onMouseLeave={stopAudio}
         onTouchStart={handleTouchStart}
