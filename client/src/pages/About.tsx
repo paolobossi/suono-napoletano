@@ -1,6 +1,43 @@
 import { Link } from "wouter";
+import { useEffect } from "react";
 
 export default function About() {
+  // Aggiorna il meta tag theme-color quando il componente viene montato
+  useEffect(() => {
+    // Gestisci meta tag theme-color
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    const originalThemeColor = metaThemeColor?.getAttribute('content') || "#1E76A6";
+    
+    // Gestisci meta tag per status bar iOS
+    const metaStatusBar = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+    const originalStatusBarStyle = metaStatusBar?.getAttribute('content') || "black";
+    
+    // Cambia colore per theme-color
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', '#f3f4f6');
+      console.log('About page: Changed theme-color to #f3f4f6');
+    }
+    
+    // Cambia status bar iOS a default (che utilizzerà il colore dello sfondo della pagina)
+    if (metaStatusBar) {
+      metaStatusBar.setAttribute('content', 'default');
+      console.log('About page: Changed iOS status bar to default');
+    }
+    
+    // Cleanup: ripristina i colori originali quando si esce dalla pagina
+    return () => {
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', originalThemeColor);
+        console.log(`About page unmount: Restored theme-color to ${originalThemeColor}`);
+      }
+      
+      if (metaStatusBar) {
+        metaStatusBar.setAttribute('content', originalStatusBarStyle);
+        console.log(`About page unmount: Restored iOS status bar to ${originalStatusBarStyle}`);
+      }
+    };
+  }, []);
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col items-center p-4 py-6 overflow-y-auto">
       <div className="bg-white rounded-lg shadow-md max-w-md w-full p-5 my-2">
