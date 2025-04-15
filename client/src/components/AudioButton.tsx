@@ -193,10 +193,10 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
     }
   };
 
-  // Function to handle stopping audio playback - soluzione drastica
+  // Function to handle stopping audio playback - versione migliorata
   const stopAudio = () => {
     try {
-      console.log("Stopping audio - HARD RESET method");
+      console.log("Stopping audio - gentle desktop / hard mobile method");
       
       // Ensure any touch timer is cleared
       if (touchTimerRef.current !== null) {
@@ -210,16 +210,25 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       
       // 2. Poi ferma effettivamente l'audio se esiste
       if (audioRef.current) {
-        // Ferma l'audio in tutti i modi possibili
+        // Ferma l'audio sempre
         audioRef.current.pause();
         
-        // Riporta la posizione all'inizio
-        audioRef.current.currentTime = 0;
+        // Desktop vs Mobile handling: su mobile riportiamo a zero, su desktop no
+        // Questo permette di riavviare l'audio su desktop senza problemi
+        if (!isDesktop) {
+          // Solo su mobile: reset completo per evitare problemi di stato
+          audioRef.current.currentTime = 0;
+          audioRef.current.volume = 0;
+          
+          // Ripristina il volume dopo un breve delay
+          setTimeout(() => {
+            if (audioRef.current) {
+              audioRef.current.volume = 1;
+            }
+          }, 100);
+        }
         
-        // Per una fermata più drastica, abbassa anche il volume a 0
-        audioRef.current.volume = 0;
-        
-        console.log("Audio playback stopped - complete reset");
+        console.log("Audio playback stopped - " + (isDesktop ? "desktop gentle stop" : "mobile complete reset"));
       }
     } catch (err) {
       console.error("Error stopping audio:", err);
@@ -232,8 +241,14 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       try {
         if (audioRef.current) {
           audioRef.current.pause();
-          audioRef.current.currentTime = 0;
-          audioRef.current.volume = 0;
+          // Resetta solo su mobile
+          if (!isDesktop) {
+            audioRef.current.currentTime = 0;
+            audioRef.current.volume = 0;
+            setTimeout(() => {
+              if (audioRef.current) audioRef.current.volume = 1;
+            }, 100);
+          }
         }
       } catch (e) {
         console.error("Critical error stopping audio:", e);
@@ -368,7 +383,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
   
   // Metodo di emergenza per fermare immediatamente la riproduzione audio
   const emergencyStop = useCallback(() => {
-    console.log("🚨 EMERGENCY AUDIO STOP TRIGGERED 🚨");
+    console.log("🚨 EMERGENCY AUDIO STOP TRIGGERED 🚨" + (isDesktop ? " (gentle desktop mode)" : " (hard mobile mode)"));
     
     try {
       // 1. Prima aggiorna l'interfaccia
@@ -383,21 +398,39 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       
       // 3. Ferma l'audio in tutti i modi possibili
       if (audioRef.current) {
+        // Pausa sempre
         audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-        audioRef.current.volume = 0;
         
-        // Ripristina il volume dopo un breve delay
-        setTimeout(() => {
-          if (audioRef.current) {
-            audioRef.current.volume = 1;
-          }
-        }, 500);
+        // Su desktop, reset più leggero per permettere riproduzioni multiple
+        if (isDesktop) {
+          // Versione desktop - solo pausa senza reset della posizione
+          // Non abbassa il volume e non resetta il currentTime
+        } else {
+          // Versione mobile - reset completo per evitare problemi
+          audioRef.current.currentTime = 0;
+          audioRef.current.volume = 0;
+          
+          // Ripristina il volume dopo un breve delay
+          setTimeout(() => {
+            if (audioRef.current) {
+              audioRef.current.volume = 1;
+            }
+          }, 500);
+        }
       }
     } catch (err) {
       console.error("Even emergency stop failed:", err);
+      
+      // Ultima risorsa
+      try {
+        if (audioRef.current) {
+          audioRef.current.pause();
+        }
+      } catch (e) {
+        console.error("Final emergency attempt failed:", e);
+      }
     }
-  }, []);
+  }, [isDesktop]);
   
   // Cleanup, safety net e monitoraggio dello stato della pagina
   useEffect(() => {
