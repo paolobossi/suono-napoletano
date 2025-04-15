@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import hatImage from '../assets/hat-napoli.png';
 
 interface HatBannerProps {
@@ -7,10 +7,11 @@ interface HatBannerProps {
 
 export function HatBanner({ className }: HatBannerProps) {
   // Check if desktop based on window width and store the window width
-  const [windowWidth, setWindowWidth] = React.useState(0);
-  const [isDesktop, setIsDesktop] = React.useState(false);
+  const [windowWidth, setWindowWidth] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [showBanner, setShowBanner] = useState(false);
   
-  React.useEffect(() => {
+  useEffect(() => {
     const checkScreenSize = () => {
       const width = window.innerWidth;
       setWindowWidth(width);
@@ -23,8 +24,17 @@ export function HatBanner({ className }: HatBannerProps) {
     // Add event listener for resize
     window.addEventListener('resize', checkScreenSize);
     
+    // Show banner after 3 seconds
+    const timer = setTimeout(() => {
+      setShowBanner(true);
+      console.log('Banner animation started');
+    }, 3000); // 3 seconds
+    
     // Cleanup
-    return () => window.removeEventListener('resize', checkScreenSize);
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+      clearTimeout(timer);
+    };
   }, []);
   
   // Calculate banner width: 32px less than window width on desktop
@@ -32,8 +42,13 @@ export function HatBanner({ className }: HatBannerProps) {
   
   return (
     <div 
-      className={`${className || ''} fixed top-0 left-0 right-0 z-50 flex justify-center`} 
-      style={{ padding: '10px 16px 0 16px' }}
+      className={`${className || ''} fixed left-0 right-0 z-50 flex justify-center transition-all duration-700 ease-in-out`} 
+      style={{ 
+        padding: '10px 16px 0 16px',
+        top: showBanner ? 0 : '-100px', // Inizia fuori dallo schermo
+        opacity: showBanner ? 1 : 0,
+        transform: showBanner ? 'translateY(0)' : 'translateY(-20px)',
+      }}
     >
       <div 
         className="bg-white rounded shadow-md" 
@@ -42,7 +57,7 @@ export function HatBanner({ className }: HatBannerProps) {
         }}
       >
         <div className="flex items-center p-2">
-          {/* Square hat image - ridotta da 14 a 12 */}
+          {/* Square hat image */}
           <div className="w-12 h-12 rounded overflow-hidden flex-shrink-0">
             <img 
               src={hatImage} 
