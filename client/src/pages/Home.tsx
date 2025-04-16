@@ -4,7 +4,7 @@ import { Link } from "wouter";
 import { AudioButton } from "@/components/AudioButton";
 import { HatBanner } from "@/components/HatBanner";
 // Import assets directly for reliable loading in production
-import backgroundImage from "../assets/naples-background-new.png";
+import backgroundImage from "../assets/naples-background-light.jpg";
 import audioMp3 from "../assets/TarantellaNapoletana.mp3";
 // iPhone SE styles will be imported dynamically when needed
 
