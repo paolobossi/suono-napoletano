@@ -63,24 +63,18 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
     };
   }, [isDesktop, isIPhoneSE]); // Add isDesktop to dependencies for proper comparison in handleResize
 
-  // Initialize and preload audio with multiple fallback mechanisms
+  // Initialize audio without autoplay
   useEffect(() => {
-    // Create new audio element with high priority
     const audio = new Audio();
-    audio.preload = "auto";
-    audio.load(); // Force immediate loading
+    audio.preload = "metadata"; // Only preload metadata, not full audio
     
     // Set up event listeners for preloading
     audio.addEventListener("loadeddata", () => {
       setIsAudioReady(true);
       console.log("Audio data loaded");
-      // Pre-buffer by playing silently
-      audio.volume = 0;
-      audio.play().then(() => {
-        audio.pause();
-        audio.currentTime = 0;
-        audio.volume = 1;
-      }).catch(() => {});
+      // Don't pre-buffer, just prepare the audio
+      audio.volume = 1;
+      audio.currentTime = 0;
     });
     
     // Special error handler with fallbacks
@@ -280,13 +274,10 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       touchTimerRef.current = null;
     }
     
-    // Start audio playback immediately
+    // Start audio playback synchronously with touch
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {
-        // Fallback if immediate play fails
-        requestAnimationFrame(startAudio);
-      });
+      audioRef.current.play().catch(console.error);
     }
   };
   
