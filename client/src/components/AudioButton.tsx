@@ -65,13 +65,22 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
 
   // Initialize and preload audio with multiple fallback mechanisms
   useEffect(() => {
-    // Create new audio element
+    // Create new audio element with high priority
     const audio = new Audio();
+    audio.preload = "auto";
+    audio.load(); // Force immediate loading
     
     // Set up event listeners for preloading
-    audio.addEventListener("canplaythrough", () => {
+    audio.addEventListener("loadeddata", () => {
       setIsAudioReady(true);
-      console.log("Audio is ready to play");
+      console.log("Audio data loaded");
+      // Pre-buffer by playing silently
+      audio.volume = 0;
+      audio.play().then(() => {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.volume = 1;
+      }).catch(() => {});
     });
     
     // Special error handler with fallbacks
@@ -258,31 +267,27 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
   
   // Improved touch handling for mobile devices - massima reattività
   const handleTouchStart = (e: React.TouchEvent) => {
-    // Previene qualsiasi propagazione che possa rallentare l'evento
     e.stopPropagation();
+    e.preventDefault(); // Prevent default touch behavior
     
-    // Aggiorna l'interfaccia IMMEDIATAMENTE per massima reattività
+    // Update UI state synchronously
     setIsPlaying(true);
     setShowFanImage(true);
     
-    // Ensure any lingering touch events are cleared
+    // Clear existing timers
     if (touchTimerRef.current !== null) {
       window.clearTimeout(touchTimerRef.current);
       touchTimerRef.current = null;
     }
     
-    // Ottimizzazione: imposta subito il currentTime a 0 se l'audio element esiste
+    // Start audio playback immediately
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(() => {
+        // Fallback if immediate play fails
+        requestAnimationFrame(startAudio);
+      });
     }
-    
-    // Log per debug
-    console.log('Touch start - IMMEDIATO aggiornamento UI');
-    
-    // Avvia l'audio con un timeout leggerissimo per dare priorità all'aggiornamento UI
-    requestAnimationFrame(() => {
-      startAudio();
-    });
   };
   
   const handleTouchEnd = (e: React.TouchEvent) => {
