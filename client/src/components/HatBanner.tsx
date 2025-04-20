@@ -50,10 +50,15 @@ export function HatBanner({ className }: HatBannerProps) {
         transform: showBanner ? 'translateY(0)' : 'translateY(-20px)',
       }}
     >
-      <div 
-        className="bg-white rounded shadow-md" 
+      <a 
+        href="https://www.etsy.com/listing/1905697071/cappellino-ricamato-in-quale-citta"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="bg-white rounded shadow-md block hover:shadow-lg transition-shadow duration-300" 
         style={{ 
           width: bannerWidth,
+          textDecoration: 'none',
+          cursor: 'pointer'
         }}
       >
         <div className="flex items-center p-2">
@@ -73,7 +78,7 @@ export function HatBanner({ className }: HatBannerProps) {
             <p className="text-xs text-gray-600">Un simbolo d'orgoglio, passione e identità.</p>
           </div>
         </div>
-      </div>
+      </a>
     </div>
   );
 }
