@@ -65,7 +65,7 @@ export default function About() {
           </p>
           
           <p className="text-sm md:text-base">
-            Il sito ha finalità esclusivamente ludiche e non commerciali. Questo è stato un progetto personale divertente per testare nuovi strumenti di intelligenza artificiale (ChatGPT, Replit).
+            Il sito è stato creato con finalità puramente ludiche, come un progetto personale per divertimento e sperimentazione.
           </p>
           
           <p className="text-sm md:text-base">
