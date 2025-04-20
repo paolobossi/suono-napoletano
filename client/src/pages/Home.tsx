@@ -153,7 +153,7 @@ export default function Home() {
   };
 
   return (
-    <div className="full-viewport w-full overflow-hidden relative" style={{ background: 'linear-gradient(to bottom, #1f77a5, #9ac3b7)' }}>
+    <div className="full-viewport w-full overflow-hidden relative">
       {/* Hat Banner - positioned at the top */}
       <HatBanner />
       
