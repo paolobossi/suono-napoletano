@@ -65,14 +65,23 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
 
   // Initialize audio without autoplay
   useEffect(() => {
+    // Rilascia eventuali istanze precedenti
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = "";
+      audioRef.current.load();
+      audioRef.current = null;
+    }
+    
+    // Crea un nuovo elemento audio con impostazioni ottimizzate
     const audio = new Audio();
-    audio.preload = "metadata"; // Only preload metadata, not full audio
+    audio.preload = "auto"; 
+    audio.autoplay = false; // Fondamentale: mai autoplay
     
     // Set up event listeners for preloading
     audio.addEventListener("loadeddata", () => {
       setIsAudioReady(true);
       console.log("Audio data loaded");
-      // Don't pre-buffer, just prepare the audio
       audio.volume = 1;
       audio.currentTime = 0;
     });
@@ -93,6 +102,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       
       // Create a new audio element for fallback
       const fallbackAudio = new Audio(fallbackUrl);
+      fallbackAudio.preload = "auto";
       
       fallbackAudio.addEventListener("canplaythrough", () => {
         console.log("Fallback audio loaded successfully");
@@ -113,26 +123,37 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
     // Log the primary source being used
     console.log("Using audio source from import:", audioFile);
     
-    // Start preloading - Use imported audio file directly as primary source
-    audio.preload = "auto";
-    
-    // Check if audioUrl is provided (from props) and use it if available
+    // Set source - prioritizing prop URL, then falling back to import
     if (audioUrl) {
       audio.src = audioUrl;
     } else {
-      // Fallback to the imported audio file
       audio.src = audioFile;
     }
     
+    // Start loading
     audio.load();
     
     // Store reference
     audioRef.current = audio;
 
+    // Detector specifico per iOS add-to-homescreen
+    const isIOSStandalone = () => 
+      window.navigator.standalone === true || 
+      window.matchMedia('(display-mode: standalone)').matches;
+    
+    // Log se è in modalità standalone
+    if (isIOSStandalone()) {
+      console.log("📱 RILEVATA MODALITÀ STANDALONE iOS - Rilascio risorse attivo");
+    }
+
     return () => {
       if (audioRef.current) {
+        // Rilascio completo delle risorse quando il componente si smonta
         audioRef.current.pause();
+        audioRef.current.volume = 0;
         audioRef.current.src = "";
+        audioRef.current.load();
+        audioRef.current = null;
         setIsAudioReady(false);
       }
     };
@@ -223,12 +244,18 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
           audioRef.current.currentTime = 0;
           audioRef.current.volume = 0;
           
-          // Ripristina il volume dopo un breve delay
+          // Rilascio risorse (fondamentale per iOS standalone app)
+          audioRef.current.src = "";
+          audioRef.current.load();
+          
+          // Reinstanziamo l'audio dopo un breve delay
           setTimeout(() => {
             if (audioRef.current) {
+              audioRef.current.src = audioFile;
               audioRef.current.volume = 1;
+              audioRef.current.load();
             }
-          }, 100);
+          }, 150);
         }
         
         console.log("Audio playback stopped - " + (isDesktop ? "desktop gentle stop" : "mobile complete reset"));
@@ -244,14 +271,18 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       try {
         if (audioRef.current) {
           audioRef.current.pause();
-          // Resetta solo su mobile
-          if (!isDesktop) {
-            audioRef.current.currentTime = 0;
-            audioRef.current.volume = 0;
-            setTimeout(() => {
-              if (audioRef.current) audioRef.current.volume = 1;
-            }, 100);
-          }
+          // Rilascio forzato delle risorse
+          audioRef.current.src = "";
+          audioRef.current.load();
+          
+          // Reinstanziate dopo un delay
+          setTimeout(() => {
+            if (audioRef.current) {
+              audioRef.current.src = audioFile;
+              audioRef.current.volume = 1;
+              audioRef.current.load();
+            }
+          }, 200);
         }
       } catch (e) {
         console.error("Critical error stopping audio:", e);
@@ -297,6 +328,10 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       try {
         audioRef.current.pause();
         audioRef.current.volume = 0; // Azzera il volume immediatamente
+        
+        // Fondamentale per iOS web app standalone: rilascia completamente l'audio
+        audioRef.current.src = "";
+        audioRef.current.load();
       } catch (err) {
         console.error("Immediate pause failed:", err);
       }
@@ -312,7 +347,19 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         if (audioRef.current) {
           audioRef.current.pause();
           audioRef.current.currentTime = 0;
-          audioRef.current.volume = 1; // Ripristina il volume per la prossima riproduzione
+          
+          // Rilascia e reinstanzia l'audio - fondamentale per iOS
+          audioRef.current.src = "";
+          audioRef.current.load();
+          
+          // Ripristina l'audio per il prossimo utilizzo
+          setTimeout(() => {
+            if (audioRef.current) {
+              audioRef.current.src = audioFile;
+              audioRef.current.volume = 1;
+              audioRef.current.load();
+            }
+          }, 150);
         }
         
         // Forza nuovamente lo stato a false per sicurezza
@@ -348,6 +395,9 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       try {
         audioRef.current.pause();
         audioRef.current.volume = 0;
+        // Rilascia tutte le risorse audio
+        audioRef.current.src = "";
+        audioRef.current.load();
       } catch (err) {
         console.error("Immediate pause on cancel failed:", err);
       }
@@ -362,7 +412,18 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         if (audioRef.current) {
           audioRef.current.pause();
           audioRef.current.currentTime = 0;
-          audioRef.current.volume = 1;
+          // Rilasciamo nuovamente le risorse
+          audioRef.current.src = "";
+          audioRef.current.load();
+          
+          // Reinstanziamo l'audio dopo un breve delay
+          setTimeout(() => {
+            if (audioRef.current) {
+              audioRef.current.src = audioFile;
+              audioRef.current.volume = 1;
+              audioRef.current.load();
+            }
+          }, 150);
         }
         setIsPlaying(false);
         console.log('Touch cancel - FINAL BACKUP STOP executed');
@@ -371,7 +432,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       } finally {
         touchTimerRef.current = null;
       }
-    }, 200);
+    }, 100); // Ridotto a 100ms per maggiore reattività
     
     // Forza nuovamente lo stato a false per sicurezza assoluta
     setIsPlaying(false);
@@ -406,12 +467,18 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
           audioRef.current.currentTime = 0;
           audioRef.current.volume = 0;
           
-          // Ripristina il volume dopo un breve delay
+          // Rilascia le risorse audio (fondamentale per bookmark iOS)
+          audioRef.current.src = "";
+          audioRef.current.load();
+          
+          // Reinstanziamo l'audio dopo un breve delay
           setTimeout(() => {
             if (audioRef.current) {
+              audioRef.current.src = audioFile;
               audioRef.current.volume = 1;
+              audioRef.current.load();
             }
-          }, 500);
+          }, 300);
         }
       }
     } catch (err) {
@@ -421,6 +488,16 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
       try {
         if (audioRef.current) {
           audioRef.current.pause();
+          audioRef.current.src = "";
+          audioRef.current.load();
+          
+          // Ricreazione con un timer
+          setTimeout(() => {
+            if (audioRef.current) {
+              audioRef.current.src = audioFile;
+              audioRef.current.load();
+            }
+          }, 200);
         }
       } catch (e) {
         console.error("Final emergency attempt failed:", e);
