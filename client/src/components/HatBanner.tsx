@@ -61,19 +61,19 @@ export function HatBanner({ className }: HatBannerProps) {
           cursor: 'pointer'
         }}
       >
-        <div className="flex items-center">
-          {/* Hat image - increased size, removed padding, with rounded corners on left side */}
-          <div className="w-18 h-14 overflow-hidden flex-shrink-0 rounded-l">
+        <div className="flex items-center rounded overflow-hidden">
+          {/* Hat image - maximized size, no padding, kept rounded corners */}
+          <div className="w-20 h-14 overflow-hidden flex-shrink-0" style={{ borderTopLeftRadius: '0.25rem', borderBottomLeftRadius: '0.25rem' }}>
             <img 
               src={hatImage} 
               alt="Cappello Napoletano" 
               className="w-full h-full object-contain"
-              style={{ objectPosition: 'center' }}
+              style={{ objectPosition: 'center', margin: 0, padding: 0 }}
             />
           </div>
           
           {/* Text content */}
-          <div className="p-2">
+          <div className="p-2 flex-grow">
             <h3 className="text-sm font-bold text-gray-900">Compra il cappello 🧢</h3>
             <p className="text-xs text-gray-600">Simbolo d'orgoglio, passione e identità.</p>
           </div>
