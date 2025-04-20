@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-
-# Ads.txt Information
-Sitemap: https://suononapoletano.com/ads.txt
