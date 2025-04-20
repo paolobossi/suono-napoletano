@@ -62,8 +62,8 @@ export function HatBanner({ className }: HatBannerProps) {
         }}
       >
         <div className="flex items-center">
-          {/* Hat image - increased size, removed padding */}
-          <div className="w-18 h-14 overflow-hidden flex-shrink-0">
+          {/* Hat image - increased size, removed padding, with rounded corners on left side */}
+          <div className="w-18 h-14 overflow-hidden flex-shrink-0 rounded-l">
             <img 
               src={hatImage} 
               alt="Cappello Napoletano" 
