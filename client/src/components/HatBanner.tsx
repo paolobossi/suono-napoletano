@@ -63,12 +63,21 @@ export function HatBanner({ className }: HatBannerProps) {
       >
         <div className="flex items-center rounded overflow-hidden">
           {/* Hat image - maximized size, no padding, kept rounded corners */}
-          <div className="w-20 h-14 overflow-hidden flex-shrink-0" style={{ borderTopLeftRadius: '0.25rem', borderBottomLeftRadius: '0.25rem' }}>
+          <div className="w-20 h-14 overflow-hidden flex-shrink-0" style={{ 
+              borderTopLeftRadius: '0.25rem', 
+              borderBottomLeftRadius: '0.25rem', 
+              padding: 0 
+            }}>
             <img 
               src={hatImage} 
               alt="Cappello Napoletano" 
-              className="w-full h-full object-contain"
-              style={{ objectPosition: 'center', margin: 0, padding: 0 }}
+              className="w-full h-full object-cover"
+              style={{ 
+                objectPosition: 'center', 
+                margin: 0, 
+                padding: 0,
+                display: 'block'
+              }}
             />
           </div>
           
