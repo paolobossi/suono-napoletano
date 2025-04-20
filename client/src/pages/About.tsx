@@ -65,7 +65,7 @@ export default function About() {
           </p>
           
           <p className="text-sm md:text-base">
-            Il sito è stato creato con finalità puramente ludiche, come un progetto personale per divertimento e sperimentazione.
+            Il sito è stato creato con finalità puramente ludiche, come un progetto personale per divertimento e sperimentazione usando ChatGPT e Replit.
           </p>
           
           <p className="text-sm md:text-base">
