@@ -57,18 +57,19 @@ export function HatBanner({ className }: HatBannerProps) {
         }}
       >
         <div className="flex items-center p-2">
-          {/* Square hat image */}
-          <div className="w-12 h-12 rounded overflow-hidden flex-shrink-0">
+          {/* Hat image */}
+          <div className="w-14 h-12 overflow-hidden flex-shrink-0">
             <img 
               src={hatImage} 
               alt="Cappello Napoletano" 
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
+              style={{ objectPosition: 'center' }}
             />
           </div>
           
           {/* Text content */}
           <div className="ml-2">
-            <h3 className="text-sm font-bold text-gray-900">Acquista il cappello 🧢</h3>
+            <h3 className="text-sm font-bold text-gray-900">Cappello "In quale città?" 🧢</h3>
             <p className="text-xs text-gray-600">Un simbolo d'orgoglio, passione e identità.</p>
           </div>
         </div>
