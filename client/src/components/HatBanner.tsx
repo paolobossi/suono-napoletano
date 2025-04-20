@@ -51,7 +51,7 @@ export function HatBanner({ className }: HatBannerProps) {
       }}
     >
       <a 
-        href="https://www.etsy.com/listing/1905697071/cappellino-ricamato-in-quale-citta"
+        href="https://www.etsy.com/it/listing/1891671874/cappello-ricamato-in-quale-citta-by"
         target="_blank"
         rel="noopener noreferrer"
         className="bg-white rounded shadow-md block hover:shadow-lg transition-shadow duration-300" 
