@@ -191,6 +191,10 @@ export default function Home() {
       )}
       
       {/* Background Image Container */}
+      {/* Background color and gradient - full width */}
+      <div className="absolute inset-0 w-full h-full" style={{ background: 'linear-gradient(to bottom, #1f77a5, #9ac3b7)' }}></div>
+      
+      {/* Background Image Container */}
       <div className="absolute inset-0 w-full h-full overflow-hidden background-container">
         {/* Background Image with desktop width constraint */}
         <div 
