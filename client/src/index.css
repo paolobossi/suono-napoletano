@@ -13,6 +13,7 @@
     margin: 0;
     padding: 0;
     overflow: hidden;
+    background: linear-gradient(to bottom, #1f77a5, #9ac3b7);
   }
 
   #root {
@@ -40,7 +41,6 @@
     align-items: center;
     height: 100%;
     width: 100%;
-    background-color: #1a1a1a; /* Dark background for the non-image area */
   }
 
   /* Background image wrapper to constrain width on desktop */
