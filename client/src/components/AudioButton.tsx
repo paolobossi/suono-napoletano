@@ -25,7 +25,6 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
   const [isDesktop, setIsDesktop] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const touchTimerRef = useRef<number | null>(null);
   
   // Check for desktop device on mount and on resize
   useEffect(() => {
@@ -63,486 +62,187 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
     };
   }, [isDesktop, isIPhoneSE]); // Add isDesktop to dependencies for proper comparison in handleResize
 
-  // Initialize audio without autoplay
-  useEffect(() => {
-    // Rilascia eventuali istanze precedenti
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = "";
-      audioRef.current.load();
-      audioRef.current = null;
-    }
-    
-    // Crea un nuovo elemento audio con impostazioni ottimizzate
-    const audio = new Audio();
-    audio.preload = "auto"; 
-    audio.autoplay = false; // Fondamentale: mai autoplay
-    
-    // Set up event listeners for preloading
-    audio.addEventListener("loadeddata", () => {
-      setIsAudioReady(true);
-      console.log("Audio data loaded");
-      audio.volume = 1;
-      audio.currentTime = 0;
-    });
-    
-    // Special error handler with fallbacks
-    audio.addEventListener("error", (e) => {
-      console.error("Audio loading error:", e);
-      const errorCode = (e.target as HTMLAudioElement).error?.code;
-      const errorMsg = (e.target as HTMLAudioElement).error?.message;
-      console.error("Audio error code:", errorCode);
-      console.error("Audio error message:", errorMsg);
-      
-      // Try fallback approach for deployment
-      console.log("Trying fallback audio source");
-      
-      // First fallback: try using /TarantellaNapoletana.mp3 from public folder
-      const fallbackUrl = "/TarantellaNapoletana.mp3";
-      
-      // Create a new audio element for fallback
-      const fallbackAudio = new Audio(fallbackUrl);
-      fallbackAudio.preload = "auto";
-      
-      fallbackAudio.addEventListener("canplaythrough", () => {
-        console.log("Fallback audio loaded successfully");
-        setIsAudioReady(true);
-        // Replace the main audio reference
-        audioRef.current = fallbackAudio;
-      });
-      
-      fallbackAudio.addEventListener("error", (fallbackErr) => {
-        console.error("Fallback audio also failed:", fallbackErr);
-        // No toast notification, just log the error
-      });
-      
-      // Attempt to load the fallback
-      fallbackAudio.load();
-    });
-    
-    // Log the primary source being used
-    console.log("Using audio source from import:", audioFile);
-    
-    // Set source - prioritizing prop URL, then falling back to import
-    if (audioUrl) {
-      audio.src = audioUrl;
-    } else {
-      audio.src = audioFile;
-    }
-    
-    // Start loading
-    audio.load();
-    
-    // Store reference
-    audioRef.current = audio;
+  // ---------------------------------------------------------------------
+  // Instant playback engine (Web Audio API)
+  // The MP3 is fetched and decoded ONCE into memory. Each press creates a
+  // lightweight buffer source that starts immediately, so there is no
+  // network/decoding delay between pressing and hearing the music.
+  // An <audio> element is kept only as a fallback while decoding finishes
+  // or on browsers without Web Audio.
+  // ---------------------------------------------------------------------
+  const ctxRef = useRef<AudioContext | null>(null);
+  const bufferRef = useRef<AudioBuffer | null>(null);
+  const sourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const gainRef = useRef<GainNode | null>(null);
+  const pressedRef = useRef(false);
 
-    // Detector specifico per iOS add-to-homescreen
-    const isIOSStandalone = () => 
-      window.navigator.standalone === true || 
-      window.matchMedia('(display-mode: standalone)').matches;
-    
-    // Log se è in modalità standalone
-    if (isIOSStandalone()) {
-      console.log("📱 RILEVATA MODALITÀ STANDALONE iOS - Rilascio risorse attivo");
+  const getContext = useCallback((): AudioContext | null => {
+    if (ctxRef.current) return ctxRef.current;
+    const Ctx = window.AudioContext || (window as any).webkitAudioContext;
+    if (!Ctx) return null;
+    try {
+      ctxRef.current = new Ctx({ latencyHint: "interactive" });
+    } catch {
+      ctxRef.current = new Ctx();
     }
+    return ctxRef.current;
+  }, []);
+
+  // Load + decode once, and prepare the fallback <audio> element
+  useEffect(() => {
+    let cancelled = false;
+    const src = audioUrl || audioFile;
+
+    // iOS 17+: play through the silent switch, like an <audio> element would
+    try {
+      const session = (navigator as any).audioSession;
+      if (session) session.type = "playback";
+    } catch {}
+
+    const fallback = new Audio(src);
+    fallback.preload = "auto";
+    fallback.addEventListener("canplaythrough", () => setIsAudioReady(true), { once: true });
+    audioRef.current = fallback;
+
+    const ctx = getContext();
+    if (ctx) {
+      fetch(src)
+        .then((r) => r.arrayBuffer())
+        .then(
+          (data) =>
+            new Promise<AudioBuffer>((resolve, reject) =>
+              // callback form for older Safari
+              ctx.decodeAudioData(data, resolve, reject)
+            )
+        )
+        .then((buffer) => {
+          if (cancelled) return;
+          bufferRef.current = buffer;
+          setIsAudioReady(true);
+        })
+        .catch((err) => console.error("Web Audio decode failed, using <audio> fallback:", err));
+    }
+
+    // Unlock the audio context on the first interaction anywhere on the page
+    // (iOS only unlocks audio inside a user gesture).
+    const unlock = () => {
+      const c = getContext();
+      if (!c) return;
+      if (c.state !== "running") c.resume().catch(() => {});
+      // Play one silent sample: required by some iOS versions to fully unlock
+      try {
+        const silent = c.createBuffer(1, 1, 22050);
+        const s = c.createBufferSource();
+        s.buffer = silent;
+        s.connect(c.destination);
+        s.start(0);
+      } catch {}
+    };
+    const unlockEvents = ["touchstart", "touchend", "pointerdown", "mousedown", "keydown"];
+    unlockEvents.forEach((e) => document.addEventListener(e, unlock, { passive: true }));
 
     return () => {
-      if (audioRef.current) {
-        // Rilascio completo delle risorse quando il componente si smonta
-        audioRef.current.pause();
-        audioRef.current.volume = 0;
-        audioRef.current.src = "";
-        audioRef.current.load();
-        audioRef.current = null;
-        setIsAudioReady(false);
-      }
+      cancelled = true;
+      unlockEvents.forEach((e) => document.removeEventListener(e, unlock));
+      fallback.pause();
+      audioRef.current = null;
     };
-  }, [audioUrl]);
+  }, [audioUrl, getContext]);
 
-  // Function to handle starting audio playback
-  const startAudio = () => {
-    if (!audioRef.current) return;
-    
-    try {
-      // Clear any existing touch timer
-      if (touchTimerRef.current !== null) {
-        window.clearTimeout(touchTimerRef.current);
-        touchTimerRef.current = null;
-      }
-      
-      // Prima aggiorna l'interfaccia per feedback immediato all'utente
-      setIsPlaying(true);
-      setShowFanImage(true);
-      
-      // Reset playback position
-      audioRef.current.currentTime = 0;
-      
-      console.log("Attempting to play audio from import source:", audioFile);
-      
-      // Play with better error handling
-      const playPromise = audioRef.current.play();
-      
-      // Modern browsers return a promise from the play() method
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            // Playback started successfully
-            console.log("Audio playback started successfully");
-            // Stato visivo già aggiornato per reattività dell'interfaccia
-          })
-          .catch(err => {
-            console.error("Failed to play audio:", err);
-            
-            // Reset UI on error
-            setIsPlaying(false);
-            setShowFanImage(false);
-            
-            // Just log the error, no toast notification
-            if (err.name === 'NotAllowedError') {
-              console.warn("Autoplay blocked - please try clicking again");
-            } else {
-              console.error("Could not play the audio. Please try again.");
-            }
-          });
-      } else {
-        // Older browsers or successful play with no promise
-        console.log("Audio playback initiated (older browser)");
-        // Stato visivo già aggiornato per reattività dell'interfaccia
-      }
-    } catch (err) {
-      console.error("Error playing audio:", err);
-      // Reset UI on error
-      setIsPlaying(false);
-      setShowFanImage(false);
-    }
-  };
-
-  // Function to handle stopping audio playback - versione migliorata
-  const stopAudio = () => {
-    try {
-      console.log("Stopping audio - gentle desktop / hard mobile method");
-      
-      // Ensure any touch timer is cleared
-      if (touchTimerRef.current !== null) {
-        window.clearTimeout(touchTimerRef.current);
-        touchTimerRef.current = null;
-      }
-      
-      // 1. Prima aggiorna l'interfaccia così è più reattiva
-      setIsPlaying(false);
-      setShowFanImage(false);
-      
-      // 2. Poi ferma effettivamente l'audio se esiste
-      if (audioRef.current) {
-        // Ferma l'audio sempre
-        audioRef.current.pause();
-        
-        // Desktop vs Mobile handling: su mobile riportiamo a zero, su desktop no
-        // Questo permette di riavviare l'audio su desktop senza problemi
-        if (!isDesktop) {
-          // Solo su mobile: reset completo per evitare problemi di stato
-          audioRef.current.currentTime = 0;
-          audioRef.current.volume = 0;
-          
-          // Rilascio risorse (fondamentale per iOS standalone app)
-          audioRef.current.src = "";
-          audioRef.current.load();
-          
-          // Reinstanziamo l'audio dopo un breve delay
-          setTimeout(() => {
-            if (audioRef.current) {
-              audioRef.current.src = audioFile;
-              audioRef.current.volume = 1;
-              audioRef.current.load();
-            }
-          }, 150);
-        }
-        
-        console.log("Audio playback stopped - " + (isDesktop ? "desktop gentle stop" : "mobile complete reset"));
-      }
-    } catch (err) {
-      console.error("Error stopping audio:", err);
-      
-      // Assicurati che l'interfaccia sia aggiornata anche in caso di errore
-      setIsPlaying(false);
-      setShowFanImage(false);
-      
-      // Tentativo di arresto più drastico in caso di errore
+  const stopSound = useCallback(() => {
+    const ctx = ctxRef.current;
+    const source = sourceRef.current;
+    const gain = gainRef.current;
+    if (ctx && source && gain) {
+      // 20ms fade-out avoids an audible click
+      const now = ctx.currentTime;
       try {
-        if (audioRef.current) {
-          audioRef.current.pause();
-          // Rilascio forzato delle risorse
-          audioRef.current.src = "";
-          audioRef.current.load();
-          
-          // Reinstanziate dopo un delay
-          setTimeout(() => {
-            if (audioRef.current) {
-              audioRef.current.src = audioFile;
-              audioRef.current.volume = 1;
-              audioRef.current.load();
-            }
-          }, 200);
-        }
-      } catch (e) {
-        console.error("Critical error stopping audio:", e);
+        gain.gain.cancelScheduledValues(now);
+        gain.gain.setValueAtTime(gain.gain.value, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.02);
+        source.stop(now + 0.025);
+      } catch {
+        try { source.stop(); } catch {}
       }
     }
-  };
-  
-  // Improved touch handling for mobile devices - massima reattività
-  const handleTouchStart = (e: React.TouchEvent) => {
-    e.stopPropagation();
-    e.preventDefault(); // Prevent default touch behavior
-    
-    // Update UI state synchronously
+    sourceRef.current = null;
+    gainRef.current = null;
+    if (audioRef.current && !audioRef.current.paused) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, []);
+
+  const startSound = useCallback(() => {
+    stopSound();
+    const ctx = getContext();
+    const buffer = bufferRef.current;
+
+    if (ctx && buffer) {
+      if (ctx.state !== "running") ctx.resume().catch(() => {});
+      const gain = ctx.createGain();
+      gain.gain.value = 1;
+      gain.connect(ctx.destination);
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(gain);
+      source.onended = () => {
+        if (sourceRef.current === source) {
+          sourceRef.current = null;
+          gainRef.current = null;
+        }
+      };
+      source.start(0);
+      sourceRef.current = source;
+      gainRef.current = gain;
+      return;
+    }
+
+    // Fallback while the buffer is still decoding
+    const audio = audioRef.current;
+    if (audio) {
+      audio.currentTime = 0;
+      audio.play().catch((err) => console.warn("Audio play blocked:", err));
+    }
+  }, [getContext, stopSound]);
+
+  // Press / release handlers (Pointer Events cover mouse, touch and pen)
+  const handlePress = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (e.button !== undefined && e.button > 0) return; // ignore right/middle click
+    e.preventDefault();
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch {}
+    pressedRef.current = true;
+    startSound(); // sound first, UI second
     setIsPlaying(true);
     setShowFanImage(true);
-    
-    // Clear existing timers
-    if (touchTimerRef.current !== null) {
-      window.clearTimeout(touchTimerRef.current);
-      touchTimerRef.current = null;
-    }
-    
-    // Start audio playback synchronously with touch
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(console.error);
-    }
   };
-  
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    // Prevenzione immediata della propagazione
-    e.stopPropagation();
-    e.preventDefault();
-    
-    // Aggiorna immediatamente l'UI per feedback istantaneo
+
+  const handleRelease = () => {
+    if (!pressedRef.current) return;
+    pressedRef.current = false;
+    stopSound();
     setIsPlaying(false);
     setShowFanImage(false);
-    
-    console.log('Touch end - RESET IMMEDIATO UI');
-    
-    // 1. Prima chiamata immediata per fermare l'audio
-    if (audioRef.current) {
-      try {
-        audioRef.current.pause();
-        audioRef.current.volume = 0; // Azzera il volume immediatamente
-        
-        // Fondamentale per iOS web app standalone: rilascia completamente l'audio
-        audioRef.current.src = "";
-        audioRef.current.load();
-      } catch (err) {
-        console.error("Immediate pause failed:", err);
-      }
-    }
-    
-    // 2. Poi chiamata a stopAudio che fa un reset completo
-    stopAudio();
-    
-    // 3. Terzo tentativo di fermata con un delay, come ulteriore sicurezza
-    touchTimerRef.current = window.setTimeout(() => {
-      try {
-        // Un ulteriore tentativo di fermare l'audio
-        if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current.currentTime = 0;
-          
-          // Rilascia e reinstanzia l'audio - fondamentale per iOS
-          audioRef.current.src = "";
-          audioRef.current.load();
-          
-          // Ripristina l'audio per il prossimo utilizzo
-          setTimeout(() => {
-            if (audioRef.current) {
-              audioRef.current.src = audioFile;
-              audioRef.current.volume = 1;
-              audioRef.current.load();
-            }
-          }, 150);
-        }
-        
-        // Forza nuovamente lo stato a false per sicurezza
-        setIsPlaying(false);
-        console.log('Touch end - FINAL BACKUP STOP executed');
-      } catch (err) {
-        console.error("Delayed stop also failed:", err);
-      } finally {
-        touchTimerRef.current = null;
-      }
-    }, 100);
   };
-  
-  // Handle touch cancel events (e.g., when notifications appear or scroll happens)
-  const handleTouchCancel = (e: React.TouchEvent) => {
-    // Prevenzione immediata della propagazione
-    e.stopPropagation();
-    
-    // Aggiorna l'UI immediatamente
-    setIsPlaying(false);
-    setShowFanImage(false);
-    
-    console.log('Touch cancel - EMERGENCY STOP triggered');
-    
-    // Cancella qualsiasi timer pendente
-    if (touchTimerRef.current !== null) {
-      window.clearTimeout(touchTimerRef.current);
-      touchTimerRef.current = null;
-    }
-    
-    // 1. Primo tentativo immediato di arresto
-    if (audioRef.current) {
-      try {
-        audioRef.current.pause();
-        audioRef.current.volume = 0;
-        // Rilascia tutte le risorse audio
-        audioRef.current.src = "";
-        audioRef.current.load();
-      } catch (err) {
-        console.error("Immediate pause on cancel failed:", err);
-      }
-    }
-    
-    // 2. Arresto completo tramite stopAudio
-    stopAudio();
-    
-    // 3. Backup finale con piccolo delay
-    touchTimerRef.current = window.setTimeout(() => {
-      try {
-        if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current.currentTime = 0;
-          // Rilasciamo nuovamente le risorse
-          audioRef.current.src = "";
-          audioRef.current.load();
-          
-          // Reinstanziamo l'audio dopo un breve delay
-          setTimeout(() => {
-            if (audioRef.current) {
-              audioRef.current.src = audioFile;
-              audioRef.current.volume = 1;
-              audioRef.current.load();
-            }
-          }, 150);
-        }
-        setIsPlaying(false);
-        console.log('Touch cancel - FINAL BACKUP STOP executed');
-      } catch (e) {
-        console.error("Final backup stop failed:", e);
-      } finally {
-        touchTimerRef.current = null;
-      }
-    }, 100); // Ridotto a 100ms per maggiore reattività
-    
-    // Forza nuovamente lo stato a false per sicurezza assoluta
-    setIsPlaying(false);
-  };
-  
-  // Metodo di emergenza per fermare immediatamente la riproduzione audio
-  const emergencyStop = useCallback(() => {
-    console.log("🚨 EMERGENCY AUDIO STOP TRIGGERED 🚨" + (isDesktop ? " (gentle desktop mode)" : " (hard mobile mode)"));
-    
-    try {
-      // 1. Prima aggiorna l'interfaccia
-      setIsPlaying(false);
-      setShowFanImage(false);
-      
-      // 2. Cancella eventuali timer
-      if (touchTimerRef.current) {
-        window.clearTimeout(touchTimerRef.current);
-        touchTimerRef.current = null;
-      }
-      
-      // 3. Ferma l'audio in tutti i modi possibili
-      if (audioRef.current) {
-        // Pausa sempre
-        audioRef.current.pause();
-        
-        // Su desktop, reset più leggero per permettere riproduzioni multiple
-        if (isDesktop) {
-          // Versione desktop - solo pausa senza reset della posizione
-          // Non abbassa il volume e non resetta il currentTime
-        } else {
-          // Versione mobile - reset completo per evitare problemi
-          audioRef.current.currentTime = 0;
-          audioRef.current.volume = 0;
-          
-          // Rilascia le risorse audio (fondamentale per bookmark iOS)
-          audioRef.current.src = "";
-          audioRef.current.load();
-          
-          // Reinstanziamo l'audio dopo un breve delay
-          setTimeout(() => {
-            if (audioRef.current) {
-              audioRef.current.src = audioFile;
-              audioRef.current.volume = 1;
-              audioRef.current.load();
-            }
-          }, 300);
-        }
-      }
-    } catch (err) {
-      console.error("Even emergency stop failed:", err);
-      
-      // Ultima risorsa
-      try {
-        if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current.src = "";
-          audioRef.current.load();
-          
-          // Ricreazione con un timer
-          setTimeout(() => {
-            if (audioRef.current) {
-              audioRef.current.src = audioFile;
-              audioRef.current.load();
-            }
-          }, 200);
-        }
-      } catch (e) {
-        console.error("Final emergency attempt failed:", e);
-      }
-    }
-  }, [isDesktop]);
-  
-  // Cleanup, safety net e monitoraggio dello stato della pagina
+
+  // Stop when the page is hidden or closed; release the context on unmount
   useEffect(() => {
-    // Verifica all'avvio che l'audio sia effettivamente fermato
-    emergencyStop();
-    
-    // Ascolta per eventi di visibilitychange del documento (quando l'utente cambia tab o minimizza)
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        // Se l'utente cambia tab o minimizza, ferma la riproduzione
-        emergencyStop();
-      }
+    const onHide = () => {
+      if (document.visibilityState === "hidden") handleRelease();
     };
-    
-    // Aggiungi event listener
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    // Ascolta per gli eventi di beforeunload (quando l'utente chiude la pagina)
-    const handleBeforeUnload = () => {
-      emergencyStop();
-    };
-    
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    
+    document.addEventListener("visibilitychange", onHide);
+    window.addEventListener("pagehide", handleRelease);
+    window.addEventListener("blur", handleRelease);
     return () => {
-      // Rimuovi gli event listener
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      
-      // Cancella eventuali timer pendenti
-      if (touchTimerRef.current !== null) {
-        window.clearTimeout(touchTimerRef.current);
-      }
-      
-      // Cleanup e ferma qualsiasi riproduzione audio quando il componente viene smontato
-      emergencyStop();
-      console.log("Cleaned up audio and event listeners on unmount");
+      document.removeEventListener("visibilitychange", onHide);
+      window.removeEventListener("pagehide", handleRelease);
+      window.removeEventListener("blur", handleRelease);
+      stopSound();
+      ctxRef.current?.close().catch(() => {});
+      ctxRef.current = null;
     };
-  }, [emergencyStop]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const getButtonContent = () => {
     if (isLoading) {
@@ -649,29 +349,11 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
         } ${
           error ? "bg-red-600 hover:bg-red-700" : "bg-[#04a0e0] hover:bg-[#038ecf]"
         }`}
-        onMouseDown={(e) => {
-          // Previeni qualsiasi propagazione per massima reattività
-          e.stopPropagation();
-          
-          // Aggiorna l'interfaccia IMMEDIATAMENTE
-          setIsPlaying(true);
-          setShowFanImage(true);
-          
-          // Ottimizzazione: imposta subito il currentTime a 0 se l'audio element esiste
-          if (audioRef.current) {
-            audioRef.current.currentTime = 0;
-          }
-          
-          // Avvia l'audio con un frame delay per dare priorità all'aggiornamento UI
-          requestAnimationFrame(() => {
-            startAudio();
-          });
-        }}
-        onMouseUp={stopAudio}
-        onMouseLeave={stopAudio}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        onTouchCancel={handleTouchCancel}
+        onPointerDown={handlePress}
+        onPointerUp={handleRelease}
+        onPointerCancel={handleRelease}
+        onLostPointerCapture={handleRelease}
+        onContextMenu={(e) => e.preventDefault()}
         disabled={isLoading || !!error}
         aria-label="Press and hold to play audio"
         style={{
@@ -681,7 +363,7 @@ export function AudioButton({ audioUrl, isLoading, error, isIPhoneSE = false }: 
           WebkitTapHighlightColor: 'transparent', // Remove tap highlight on iOS
           WebkitTouchCallout: 'none', // Disable callout on long press
           WebkitUserSelect: 'none', // Disable text selection
-          touchAction: 'manipulation' // Optimize for touch
+          touchAction: 'none' // No browser gestures/delay on the button
         }}
       >
         {getButtonContent()}
