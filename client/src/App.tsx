@@ -1,4 +1,5 @@
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route, useLocation, Router as WouterRouter } from "wouter";
+import { useHashLocation } from "wouter/use-hash-location";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { lazy, Suspense, useEffect, useState } from "react";
@@ -36,7 +37,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="h-full w-full">
-        <Router />
+        <WouterRouter hook={useHashLocation}>
+          <Router />
+        </WouterRouter>
       </div>
     </QueryClientProvider>
   );
