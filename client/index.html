@@ -69,6 +69,9 @@
           if (now - lastTouchEnd <= 300) e.preventDefault();
           lastTouchEnd = now;
         }, { passive: false });
+        // Long-press / right-click menu (copy, save image…)
+        document.addEventListener("contextmenu", block);
+        document.addEventListener("dragstart", block);
         // Ctrl/Cmd + wheel or +/- on desktop
         document.addEventListener("wheel", function (e) {
           if (e.ctrlKey) e.preventDefault();
