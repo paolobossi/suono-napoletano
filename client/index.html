@@ -51,6 +51,33 @@
         flex-direction: column;
       }
     </style>
+    <script>
+      // Block zoom on iOS Safari, which ignores user-scalable=no
+      (function () {
+        var block = function (e) { e.preventDefault(); };
+        ["gesturestart", "gesturechange", "gestureend"].forEach(function (t) {
+          document.addEventListener(t, block, { passive: false });
+        });
+        // Pinch with two or more fingers
+        document.addEventListener("touchmove", function (e) {
+          if (e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
+        // Double-tap zoom
+        var lastTouchEnd = 0;
+        document.addEventListener("touchend", function (e) {
+          var now = Date.now();
+          if (now - lastTouchEnd <= 300) e.preventDefault();
+          lastTouchEnd = now;
+        }, { passive: false });
+        // Ctrl/Cmd + wheel or +/- on desktop
+        document.addEventListener("wheel", function (e) {
+          if (e.ctrlKey) e.preventDefault();
+        }, { passive: false });
+        document.addEventListener("keydown", function (e) {
+          if ((e.ctrlKey || e.metaKey) && ["+", "-", "=", "0"].indexOf(e.key) !== -1) e.preventDefault();
+        });
+      })();
+    </script>
   </head>
 
   <body>
